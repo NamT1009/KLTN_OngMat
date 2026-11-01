@@ -30,6 +30,10 @@ const demoUsers = [
 async function ensureDemoUsers() {
     try {
         const pool = await poolPromise;
+        if (!pool) {
+            console.log('ℹ️ Không có kết nối SQL Server, bỏ qua đồng bộ tài khoản demo.');
+            return;
+        }
         const existingUsers = await pool.request().query('SELECT maNguoiDung, email, soDienThoai, matKhauHash, vaiTro, trangThaiTaiKhoan, hoTen FROM nguoiDung');
         const existingMap = new Map(
             (existingUsers.recordset || []).map(user => [String(user.email || '').trim().toLowerCase(), user])
