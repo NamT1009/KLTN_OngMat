@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký Đối Tác | Hệ Thống Quản Trị & Truy Vết Ong Mật</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & Font Awesome 6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-amber: #f59e0b;
+            --primary-amber-glow: rgba(245, 158, 11, 0.4);
+            --bg-dark: #080d1a;
+            --card-bg: rgba(15, 23, 42, 0.88);
+            --border-color: rgba(245, 158, 11, 0.28);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(10, 15, 29, 0.75);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(135deg, rgba(8, 13, 26, 0.78) 0%, rgba(15, 23, 42, 0.82) 50%, rgba(8, 13, 26, 0.88) 100%),
+                url('/images/bee_background.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 30px 16px;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-custom {
+            background: var(--card-bg);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.75), 0 0 45px -8px var(--primary-amber-glow);
+            overflow: hidden;
+        }
+
+        .brand-header {
+            padding: 32px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .brand-logo-hex {
+            width: 66px;
+            height: 66px;
+            margin: 0 auto 14px auto;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.45));
+            border: 1px solid rgba(245, 158, 11, 0.55);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.35);
+            padding: 7px;
+        }
+
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #fef08a 0%, #fbbf24 40%, #f59e0b 80%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .card-body-content {
+            padding: 0 32px 32px 32px;
+        }
+
+        /* Role selector tabs */
+        .role-option input {
+            display: none;
+        }
+
+        .role-option label {
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(10, 15, 29, 0.65);
+            border-radius: 14px;
+            padding: 14px 10px;
+            cursor: pointer;
+            text-align: center;
+            width: 100%;
+            transition: all 0.25s ease;
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .role-option input:checked + label {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.18);
+            color: #fbbf24;
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .form-label {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 7px;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 0.92rem;
+            color: #f8fafc;
+            transition: all 0.25s ease;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            background: rgba(15, 23, 42, 0.95);
+            border-color: var(--primary-amber);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+            color: #fff;
+        }
+
+        .btn-honey-primary {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.96rem;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 20px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.42);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-honey-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px -4px rgba(245, 158, 11, 0.6);
+            color: #0b0f19;
+        }
+
+        .custom-alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer-link a {
+            color: #fbbf24;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-footer-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-wrapper">
+        <div class="card-custom">
+            <div class="brand-header">
+                <div class="brand-logo-hex">
+                    <svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="url(#regHexGrad)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+                        <ellipse cx="20" cy="23" rx="8" ry="14" transform="rotate(-38 20 23)" fill="url(#regWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                        <ellipse cx="44" cy="23" rx="8" ry="14" transform="rotate(38 44 23)" fill="url(#regWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                        <ellipse cx="32" cy="36" rx="11" ry="16" fill="url(#regBodyGrad)"/>
+                        <path d="M22.5 30 Q32 32.5 41.5 30 L41 33.5 Q32 36 23 33.5 Z" fill="#0f172a"/>
+                        <path d="M21.5 37 Q32 40 42.5 37 L41.5 40.5 Q32 43.5 22.5 40.5 Z" fill="#0f172a"/>
+                        <path d="M24 44.5 Q32 47 40 44.5 L38.5 48 Q32 50.5 25.5 48 Z" fill="#0f172a"/>
+                        <path d="M30.5 51.5 L32 56 L33.5 51.5 Z" fill="#0f172a"/>
+                        <circle cx="32" cy="22" r="7.5" fill="#f59e0b"/>
+                        <ellipse cx="29" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                        <ellipse cx="35" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                        <path d="M29 16 Q26 9 20 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="20" cy="11" r="1.8" fill="#fbbf24"/>
+                        <path d="M35 16 Q38 9 44 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="44" cy="11" r="1.8" fill="#fbbf24"/>
+                        <defs>
+                            <linearGradient id="regHexGrad" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#b45309" stop-opacity="0.4"/>
+                                <stop offset="1" stop-color="#f59e0b" stop-opacity="0.12"/>
+                            </linearGradient>
+                            <linearGradient id="regBodyGrad" x1="21" y1="20" x2="43" y2="52" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#fde047"/>
+                                <stop offset="0.5" stop-color="#f59e0b"/>
+                                <stop offset="1" stop-color="#d97706"/>
+                            </linearGradient>
+                            <linearGradient id="regWingGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#ffffff" stop-opacity="0.95"/>
+                                <stop offset="0.8" stop-color="#fef9c3" stop-opacity="0.75"/>
+                                <stop offset="1" stop-color="#fde047" stop-opacity="0.5"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="brand-title">ĐĂNG KÝ ĐỐI TÁC</h1>
+                <p class="brand-subtitle">Gia nhập hệ sinh thái nuôi ong và kết nối vùng hoa</p>
+            </div>
+
+            <div class="card-body-content">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="custom-alert-error">
+                        <i class="fas fa-exclamation-triangle me-1"></i> <%= error %>
+                    </div>
+                <% } %>
+
+                <form action="/dang-ky" method="POST">
+                    <label class="form-label mb-2">Chọn vai trò tham gia</label>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 role-option">
+                            <input type="radio" name="vaiTro" id="r1" value="nguoiNuoiOng" <%= (typeof form !== 'undefined' && form && form.vaiTro === 'chuDat') ? '' : 'checked' %>>
+                            <label for="r1">
+                                <i class="fas fa-archive d-block fs-4 mb-2 text-warning"></i>
+                                <span>Người nuôi ong</span>
+                            </label>
+                        </div>
+                        <div class="col-6 role-option">
+                            <input type="radio" name="vaiTro" id="r2" value="chuDat" <%= (typeof form !== 'undefined' && form && form.vaiTro === 'chuDat') ? 'checked' : '' %>>
+                            <label for="r2">
+                                <i class="fas fa-seedling d-block fs-4 mb-2 text-success"></i>
+                                <span>Chủ đất / Rẫy hoa</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Họ và tên</label>
+                        <input name="hoTen" class="form-control-custom" required minlength="2" placeholder="Nguyễn Văn A" value="<%= (typeof form !== 'undefined' && form) ? (form.hoTen || '') : '' %>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email liên hệ</label>
+                        <input type="email" name="email" class="form-control-custom" required placeholder="name@domain.com" value="<%= (typeof form !== 'undefined' && form) ? (form.email || '') : '' %>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại</label>
+                        <input name="soDienThoai" class="form-control-custom" required pattern="0[0-9]{9,10}" title="10-11 chữ số, bắt đầu bằng 0" placeholder="0912345678" value="<%= (typeof form !== 'undefined' && form) ? (form.soDienThoai || '') : '' %>">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Mật khẩu (tối thiểu 6 ký tự)</label>
+                        <input type="password" name="matKhau" class="form-control-custom" required minlength="6" placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn-honey-primary">
+                        <i class="fas fa-check-circle"></i> Hoàn tất đăng ký
+                    </button>
+                </form>
+
+                <div class="auth-footer-link">
+                    Đã có tài khoản? <a href="/login">Đăng nhập ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

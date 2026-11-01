@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả tìm kiếm | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { width: 260px; height: 100vh; background-color: #343a40; color: #fff; position: fixed; top: 0; left: 0; z-index: 1000; overflow-y: auto; }
+        .sidebar-brand { padding: 20px; font-size: 1.2rem; font-weight: bold; background: #212529; text-align: center; color: #ffc107; border-bottom: 1px solid #4b545c; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+        .sidebar-menu li a { display: block; padding: 15px 20px; color: #c2c7d0; text-decoration: none; border-left: 3px solid transparent; transition: 0.3s; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background-color: #495057; color: #fff; border-left-color: #ffc107; }
+        .sidebar-menu li a i { width: 25px; text-align: center; margin-right: 10px; }
+        .main-content { margin-left: 260px; min-height: 100vh; padding: 30px; display: flex; flex-direction: column; }
+    </style>
+</head>
+<body>
+    <%- include('partials/sidebar') %>
+
+    <div class="main-content">
+        <%- include('partials/topbar') %>
+
+        <div class="mb-4">
+            <h3 class="text-secondary fw-bold">Kết quả tìm kiếm cho: "<span class="text-primary"><%= tuKhoa %></span>"</h3>
+        </div>
+
+        <!-- 1. KẾT QUẢ: NGƯỜI DÙNG -->
+        <% if (danhSachNguoiDung.length > 0) { %>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom fw-bold text-dark">
+                    <i class="fas fa-users text-primary me-2"></i> Người Dùng (<%= danhSachNguoiDung.length %>)
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light"><tr><th>Họ Tên</th><th>SĐT</th><th>Email</th><th>Vai Trò</th></tr></thead>
+                        <tbody>
+                            <% danhSachNguoiDung.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.hoTen %></td>
+                                    <td><%= user.soDienThoai %></td>
+                                    <td><%= user.email %></td>
+                                    <td><span class="badge bg-secondary"><%= user.vaiTro %></span></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- 2. KẾT QUẢ: ĐỊA ĐIỂM VƯỜN -->
+        <% if (danhSachDiaDiem.length > 0) { %>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom fw-bold text-dark">
+                    <i class="fas fa-map-marker-alt text-danger me-2"></i> Địa Điểm Vườn (<%= danhSachDiaDiem.length %>)
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light"><tr><th>Tên Vườn</th><th>Địa Chỉ</th><th>Trạng Thái</th></tr></thead>
+                        <tbody>
+                            <% danhSachDiaDiem.forEach(vuon => { %>
+                                <tr>
+                                    <td class="fw-bold"><%= vuon.tenDiaDiem %></td>
+                                    <td><%= vuon.diaChiChiTiet %></td>
+                                    <td><span class="badge bg-warning text-dark"><%= vuon.trangThaiKiemDuyet %></span></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- 3. KẾT QUẢ: LOÀI HOA -->
+        <% if (danhSachHoa && danhSachHoa.length > 0) { %>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom fw-bold text-dark">
+                    <i class="fas fa-leaf text-success me-2"></i> Kết Quả: Loài Hoa (<%= danhSachHoa.length %>)
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="10%">Mã Hoa</th>
+                                <th width="25%">Tên Loài Hoa</th>
+                                <th>Mô Tả Sinh Học / Mật Độ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% danhSachHoa.forEach(hoa => { %>
+                                <tr>
+                                    <td>#<%= hoa.maLoaiHoa %></td> 
+                                    <td class="fw-bold text-success"><%= hoa.tenLoaiHoa %></td>
+                                    
+                                    <td class="text-muted text-break"><%= hoa.moTaMatDo %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+        <!-- 4. KẾT QUẢ: GIỐNG ONG -->
+        <% if (danhSachOng && danhSachOng.length > 0) { %>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom fw-bold text-dark">
+                    <i class="fas fa-bug text-warning me-2"></i> Kết Quả: Loài Ong (<%= danhSachOng.length %>)
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mã</th>
+                                <th>Tên Loài Ong</th>
+                                <th>Năng Suất (Năm)</th>
+                                <th>Sản Phẩm Chủ Lực</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% danhSachOng.forEach(ong => { %>
+                                <tr>
+                                    <td>#<%= ong.maLoaiOng %></td>
+                                    <td class="fw-bold text-primary"><%= ong.tenLoaiOng %></td>
+                                    <td><%= ong.nangSuatTrungBinh %></td>
+                                    <td><%= ong.sanPhamChuLuc %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+        <!-- NẾU KHÔNG TÌM THẤY GÌ -->
+        <% if (danhSachNguoiDung.length === 0 && danhSachDiaDiem.length === 0 && danhSachHoa.length === 0 && danhSachOng.length === 0) { %>
+            <div class="alert alert-warning text-center py-5">
+                <i class="fas fa-search-minus fs-1 text-muted mb-3 d-block"></i>
+                <h5 class="text-muted">Không tìm thấy kết quả nào phù hợp với từ khóa của bạn.</h5>
+            </div>
+        <% } %>
+
+    </div>
+</body>
+</html>

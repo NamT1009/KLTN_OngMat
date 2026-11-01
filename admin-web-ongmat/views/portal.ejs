@@ -1,0 +1,3372 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    <%= user.vaiTro==='chudat' ? 'Cổng Chủ Đất' : 'Cổng Người Nuôi Ong' %> | Hệ Thống Quản Lý & Truy Vết Ong Mật
+  </title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & Font Awesome 6 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <style>
+    :root {
+      --honey-primary: #f59e0b;
+      --honey-dark: #d97706;
+      --honey-soft: #fef3c7;
+      --honey-subtle: #fffbeb;
+      --honey-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --honey-glow: 0 8px 24px -4px rgba(245, 158, 11, 0.35);
+
+      --nature-green: #10b981;
+      --nature-dark: #059669;
+      --nature-soft: #d1fae5;
+
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+      background-color: #f8fafc;
+      color: var(--slate-800);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Modern Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.05); }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* ================= SIDEBAR CHUẨN ADMIN - ĐẬM CHẤT NÔNG TRẠI & ONG MẬT ================= */
+    aside.sidebar {
+      width: 270px !important;
+      height: 100vh !important;
+      background: linear-gradient(180deg, #0e131f 0%, #151d2e 50%, #0d121c 100%) !important;
+      color: #e2e8f0 !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      z-index: 1045 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      border-right: 1px solid rgba(245, 158, 11, 0.18) !important;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      transition: all 0.3s ease;
+    }
+
+    aside.sidebar::-webkit-scrollbar { width: 4px; }
+    aside.sidebar::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.25); border-radius: 4px; }
+
+    /* Brand Header with Honeybee Vector Logo */
+    .sidebar-brand-custom {
+      padding: 20px 18px 18px 18px;
+      background: rgba(15, 23, 42, 0.75);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none !important;
+      transition: background 0.2s;
+    }
+
+    .brand-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(217, 119, 6, 0.45));
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+      flex-shrink: 0;
+      padding: 5px;
+      transition: transform 0.25s ease;
+    }
+
+    .sidebar-brand-custom:hover .brand-icon-box {
+      transform: scale(1.06);
+    }
+
+    .brand-text-box h5 {
+      font-size: 0.98rem;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: 0.6px;
+      background: linear-gradient(135deg, #fef08a 0%, #fbbf24 60%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text-box .brand-tagline {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* Menu Navigation List */
+    .sidebar-menu-nav {
+      list-style: none !important;
+      padding: 14px 14px 28px 14px !important;
+      margin: 0 !important;
+      flex-grow: 1;
+    }
+
+    .menu-header-label {
+      padding: 18px 12px 8px 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .menu-header-label:first-of-type {
+      padding-top: 4px;
+    }
+
+    .sidebar-menu-nav li {
+      list-style: none !important;
+      margin-bottom: 7px !important;
+    }
+
+    .sidebar-menu-nav a {
+      display: flex !important;
+      align-items: center !important;
+      padding: 10px 14px !important;
+      color: #94a3b8 !important;
+      text-decoration: none !important;
+      border-radius: 12px !important;
+      font-size: 0.88rem !important;
+      font-weight: 500 !important;
+      transition: all 0.2s ease !important;
+      position: relative;
+    }
+
+    .sidebar-menu-nav a .nav-icon-wrapper {
+      width: 26px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      margin-right: 12px !important;
+      font-size: 0.95rem !important;
+      color: #64748b;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar-menu-nav a:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+      color: #f8fafc !important;
+      transform: translateX(4px);
+    }
+
+    .sidebar-menu-nav a:hover .nav-icon-wrapper {
+      color: #fbbf24;
+    }
+
+    /* Active Glowing Amber Capsule */
+    .sidebar-menu-nav a.active {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%) !important;
+      color: #0b0f19 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.38) !important;
+    }
+
+    .sidebar-menu-nav a.active .nav-icon-wrapper {
+      color: #0b0f19 !important;
+    }
+
+    .menu-badge-counter {
+      margin-left: auto;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    /* Sidebar Footer User Card */
+    .sidebar-footer-custom {
+      padding: 14px 16px;
+      background: rgba(10, 15, 26, 0.88);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .user-avatar-mini {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 2px solid rgba(245, 158, 11, 0.5);
+    }
+
+    .user-info-mini {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+
+    .user-info-mini .user-name {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
+    }
+
+    .user-info-mini .user-role {
+      font-size: 0.7rem;
+      color: #fbbf24;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .btn-logout-mini {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-logout-mini:hover {
+      background: #ef4444;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 270px !important;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #f8fafc;
+      transition: margin-left 0.3s ease;
+    }
+
+    .content-wrapper {
+      padding: 20px 26px 48px 26px;
+      flex-grow: 1;
+    }
+
+    /* Topbar Header Container */
+    .topbar-container-custom {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      border-radius: 16px;
+      padding: 12px 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 14px;
+      z-index: 1020;
+    }
+
+    .topbar-welcome-tip {
+      font-size: 0.88rem;
+      color: #334155;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .topbar-actions-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* User Profile Pill in Header */
+    .user-pill-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.35rem 0.85rem 0.35rem 0.45rem;
+      border-radius: 99px;
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .user-pill-wrap:hover {
+      background: var(--slate-50);
+      border-color: var(--honey-primary);
+    }
+
+    /* Backdrop for Mobile */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 1040;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-backdrop.show {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Responsive for Tablets & Mobile */
+    @media (max-width: 991.98px) {
+      aside.sidebar {
+        transform: translateX(-100%);
+      }
+      aside.sidebar.show {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0 !important;
+      }
+      .content-wrapper {
+        padding: 14px 14px 36px 14px;
+      }
+      .topbar-container-custom {
+        top: 0;
+        border-radius: 0 0 16px 16px;
+        margin-bottom: 16px;
+      }
+    }
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn:hover {
+      background: var(--slate-100);
+      color: var(--slate-900);
+    }
+
+    .nav-tab-btn:hover i {
+      color: var(--honey-primary);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--honey-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+      border-color: transparent;
+    }
+
+    .nav-tab-btn.active i {
+      color: #ffffff;
+    }
+
+    .nav-tab-btn .badge-pill-count {
+      padding: 0.2rem 0.55rem;
+      border-radius: 99px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    /* ================= MAIN CONTENT ================= */
+    .portal-content {
+      padding: 1.5rem;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Welcome Hero Banner (Thân thiện, dễ tiếp cận) */
+    .welcome-hero {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 2rem;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-hero::after {
+      content: '';
+      position: absolute;
+      right: -20px;
+      top: -20px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%);
+      pointer-events: none;
+    }
+
+    .welcome-title {
+      font-weight: 800;
+      font-size: 1.55rem;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.3px;
+    }
+
+    .welcome-sub {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      max-width: 750px;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    /* Step Guide Roadmap (3 bước trực quan dễ hiểu) */
+    .step-roadmap {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 1.25rem;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .step-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--honey-primary);
+      color: #ffffff;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+    }
+
+    .step-arrow {
+      color: rgba(255, 255, 255, 0.35);
+      font-size: 0.85rem;
+    }
+
+    /* Quick Action Buttons (To, rõ ràng, dễ bấm) */
+    .quick-cta-btn {
+      padding: 0.65rem 1.35rem;
+      border-radius: 99px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .quick-cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .quick-cta-btn.amber {
+      background: var(--honey-gradient);
+      color: #ffffff;
+    }
+
+    .quick-cta-btn.green {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+    }
+
+    .quick-cta-btn.light {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* ================= STAT CARDS ================= */
+    .stat-card {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      padding: 1.35rem 1.5rem;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--honey-primary);
+      box-shadow: 0 12px 24px -4px rgba(245, 158, 11, 0.12);
+    }
+
+    .stat-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    .stat-icon-box.amber { background: #fef3c7; color: #d97706; }
+    .stat-icon-box.emerald { background: #d1fae5; color: #059669; }
+    .stat-icon-box.sky { background: #e0f2fe; color: #0284c7; }
+    .stat-icon-box.rose { background: #ffe4e6; color: #e11d48; }
+
+    .stat-number {
+      font-size: 2.15rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.5px;
+    }
+
+    .stat-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--slate-600);
+      margin: 0;
+    }
+
+    /* ================= CARD CONTAINERS ================= */
+    .card-modern {
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.03);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header-modern {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--slate-100);
+    }
+
+    .card-title-modern {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* ================= BẢN ĐỒ ================= */
+    .map-container {
+      height: 420px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    .map-sm {
+      height: 300px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    /* ================= TABLES ================= */
+    .table-modern-wrap {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+    }
+
+    .table-modern {
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .table-modern thead th {
+      background: var(--slate-50);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--slate-600);
+      padding: 0.95rem 1.15rem;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    .table-modern tbody td {
+      padding: 1rem 1.15rem;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--slate-100);
+      font-size: 0.9rem;
+    }
+
+    .table-modern tbody tr:last-child td { border-bottom: none; }
+    .table-modern tbody tr:hover td { background-color: #fafbfc; }
+
+    /* ================= CHAT HUB ================= */
+    .chat-layout {
+      height: 660px;
+      background: #ffffff;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--slate-200);
+      overflow: hidden;
+      display: flex;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .chat-sidebar-pane {
+      width: 320px;
+      border-right: 1px solid var(--slate-200);
+      display: flex;
+      flex-direction: column;
+      background: #fafbfc;
+      flex-shrink: 0;
+    }
+
+    .chat-main-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      min-width: 0;
+    }
+
+    .chat-list-item {
+      padding: 0.9rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      border-bottom: 1px solid var(--slate-100);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chat-list-item:hover { background: var(--slate-100); }
+    .chat-list-item.active { background: #fffbeb; border-left: 4px solid var(--honey-primary); }
+
+    .chat-msg-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      background: #f8fafc;
+    }
+
+    .chat-bubble {
+      max-width: 72%;
+      padding: 0.8rem 1.15rem;
+      border-radius: 18px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      word-break: break-word;
+      position: relative;
+    }
+
+    .chat-bubble.mine {
+      align-self: flex-end;
+      background: var(--honey-gradient);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    .chat-bubble.theirs {
+      align-self: flex-start;
+      background: #ffffff;
+      color: var(--slate-900);
+      border: 1px solid var(--slate-200);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .chat-bubble-time {
+      font-size: 0.7rem;
+      opacity: 0.75;
+      margin-top: 0.25rem;
+      text-align: right;
+    }
+
+    .chat-input-bar {
+      padding: 0.85rem 1.25rem;
+      background: #ffffff;
+      border-top: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Task done strikethrough */
+    .task-done {
+      text-decoration: line-through;
+      color: var(--slate-400) !important;
+    }
+
+    /* Toast */
+    #toast-area {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 99999;
+      max-width: 420px;
+      width: calc(100% - 48px);
+      pointer-events: none;
+    }
+
+    .toast-custom {
+      pointer-events: auto;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      border: 1px solid var(--slate-200);
+      border-left: 5px solid var(--honey-primary);
+      padding: 0.95rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 0.65rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast-custom.error { border-left-color: #ef4444; }
+    .toast-custom.success { border-left-color: #10b981; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Backdrop cho menu trượt trên điện thoại / tablet -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ASIDE SIDEBAR CHUẨN ADMIN - ĐẬM CHẤT NÔNG TRẠI & ONG MẬT ẤM CÚNG -->
+  <aside class="sidebar portal-sidebar" id="portalSidebar">
+    <!-- Brand Header với Logo Con Ong Mật Vector Cao Cấp -->
+    <a href="#overview" class="sidebar-brand-custom" data-tab="overview">
+      <div class="brand-icon-box">
+        <svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="url(#portalSideHexGrad)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+          <ellipse cx="20" cy="23" rx="8" ry="14" transform="rotate(-38 20 23)" fill="url(#portalSideWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+          <ellipse cx="44" cy="23" rx="8" ry="14" transform="rotate(38 44 23)" fill="url(#portalSideWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+          <ellipse cx="32" cy="36" rx="11" ry="16" fill="url(#portalSideBodyGrad)"/>
+          <path d="M22.5 30 Q32 32.5 41.5 30 L41 33.5 Q32 36 23 33.5 Z" fill="#0f172a"/>
+          <path d="M21.5 37 Q32 40 42.5 37 L41.5 40.5 Q32 43.5 22.5 40.5 Z" fill="#0f172a"/>
+          <path d="M24 44.5 Q32 47 40 44.5 L38.5 48 Q32 50.5 25.5 48 Z" fill="#0f172a"/>
+          <path d="M30.5 51.5 L32 56 L33.5 51.5 Z" fill="#0f172a"/>
+          <circle cx="32" cy="22" r="7.5" fill="#f59e0b"/>
+          <ellipse cx="29" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+          <ellipse cx="35" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+          <path d="M29 16 Q26 9 20 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M35 16 Q38 9 44 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <defs>
+            <linearGradient id="portalSideHexGrad" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#b45309" stop-opacity="0.45"/>
+              <stop offset="1" stop-color="#f59e0b" stop-opacity="0.12"/>
+            </linearGradient>
+            <linearGradient id="portalSideBodyGrad" x1="21" y1="20" x2="43" y2="52" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#fde047"/>
+              <stop offset="0.5" stop-color="#f59e0b"/>
+              <stop offset="1" stop-color="#d97706"/>
+            </linearGradient>
+            <linearGradient id="portalSideWingGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop stop-color="#ffffff" stop-opacity="0.95"/>
+              <stop offset="0.8" stop-color="#fef9c3" stop-opacity="0.8"/>
+              <stop offset="1" stop-color="#fde047" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text-box">
+        <h5>TRUY VẾT ONG MẬT</h5>
+        <div class="brand-tagline">
+          <% if (user.vaiTro === 'chudat') { %>
+            <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); font-size: 0.68rem;">
+              <i class="fas fa-mountain-sun me-1"></i> Cổng Chủ Đất Vườn
+            </span>
+          <% } else { %>
+            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); font-size: 0.68rem;">
+              <i class="fas fa-hive me-1"></i> Cổng Người Nuôi Ong
+            </span>
+          <% } %>
+        </div>
+      </div>
+    </a>
+
+    <!-- Menu Danh Mục Điều Hướng Tương Tự Admin -->
+    <ul class="sidebar-menu-nav" id="sidebarMenuNav">
+      <!-- Được render động bằng renderNavBar() -->
+    </ul>
+
+    <!-- Sidebar Footer Thông Tin Tài Khoản & Nút Đăng Xuất -->
+    <div class="sidebar-footer-custom">
+      <div class="user-avatar-mini" id="sidebarUserAvatar">
+        <% if (user.anhDaiDien) { %>
+          <img src="<%= user.anhDaiDien %>" class="w-100 h-100 object-fit-cover" onerror="this.onerror=null; this.src='/images/default-avatar.svg';">
+        <% } else { %>
+          <%= (user.hoTen || 'U').charAt(0).toUpperCase() %>
+        <% } %>
+      </div>
+      <div class="user-info-mini">
+        <div class="user-name"><%= user.hoTen %></div>
+        <div class="user-role">
+          <% if (user.vaiTro === 'chudat') { %>
+            <i class="fas fa-mountain-sun me-1 text-success"></i>Chủ Vườn Đất
+          <% } else { %>
+            <i class="fas fa-certificate me-1 text-warning"></i>Người Nuôi Ong
+          <% } %>
+        </div>
+      </div>
+      <a href="/logout" class="btn-logout-mini" title="Đăng xuất khỏi hệ thống">
+        <i class="fas fa-arrow-right-from-bracket"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- KHU VỰC NỘI DUNG CHÍNH (main-content với margin-left: 270px) -->
+  <div class="main-content">
+    <div class="content-wrapper">
+      <!-- Topbar Nổi Đẹp Mắt Tương Tự Admin -->
+      <div class="topbar-container-custom">
+        <div class="d-flex align-items-center gap-3">
+          <!-- Nút Menu 3 gạch trên Mobile/Tablet -->
+          <button class="btn btn-sm btn-light border d-lg-none" id="sidebarToggle" style="border-radius: 10px;" title="Mở danh mục">
+            <i class="fas fa-bars fs-6 text-dark"></i>
+          </button>
+
+          <!-- Lời chào & Gợi ý mùa hoa nông trại -->
+          <div class="topbar-welcome-tip d-none d-sm-flex align-items-center">
+            <% if (user.vaiTro === 'chudat') { %>
+              <i class="fas fa-seedling text-success fs-5 me-2"></i>
+              <div>
+                <div>Xin chào Bác <b><%= user.hoTen %></b>! <span class="badge text-bg-success-subtle text-success border border-success-subtle ms-1" id="headerReputationBadge"></span></div>
+                <div class="small text-muted" style="font-size: 0.75rem;">Mùa hoa nở rộ, sẵn sàng đón các đàn ong đến lấy mật & thụ phấn cây trồng.</div>
+              </div>
+            <% } else { %>
+              <i class="fas fa-sun text-warning fs-5 me-2"></i>
+              <div>
+                <div>Xin chào Bác <b><%= user.hoTen %></b>! <span class="badge text-bg-warning-subtle text-warning border border-warning-subtle ms-1" id="headerReputationBadge"></span></div>
+                <div class="small text-muted" style="font-size: 0.75rem;">Thời tiết hôm nay nắng ấm thuận lợi, đàn ong đang tích cực kiếm mật hoa.</div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Các Nút Thao Tác Nhanh Phía Phải -->
+        <div class="topbar-actions-area">
+          <!-- Nút Hành Động Nhanh Tùy Theo Vai Trò -->
+          <% if (user.vaiTro === 'chudat') { %>
+            <button class="btn btn-sm btn-warning fw-bold text-dark rounded-pill px-3 shadow-sm d-flex align-items-center gap-2" onclick="locationForm()" style="background: var(--honey-gradient); border:none; color:#fff !important;">
+              <i class="fas fa-plus-circle"></i>
+              <span class="d-none d-md-inline">Đăng Vườn Mới</span>
+            </button>
+          <% } else { %>
+            <button class="btn btn-sm btn-warning fw-bold text-dark rounded-pill px-3 shadow-sm d-flex align-items-center gap-2" onclick="hiveForm()" style="background: var(--honey-gradient); border:none; color:#fff !important;">
+              <i class="fas fa-plus-circle"></i>
+              <span class="d-none d-md-inline">Tạo Đàn Ong</span>
+            </button>
+          <% } %>
+
+          <!-- Nút Tin Nhắn Trao Đổi -->
+          <button class="btn btn-outline-warning btn-sm text-dark fw-bold rounded-pill px-3 position-relative d-flex align-items-center gap-2" data-tab="chat" title="Mở hộp tin nhắn">
+            <i class="fas fa-comments text-warning"></i>
+            <span class="d-none d-md-inline">Tin nhắn</span>
+            <span class="badge rounded-pill bg-danger d-none" id="chatBadgeTop">0</span>
+          </button>
+
+          <!-- Nút Chuông Thông Báo -->
+          <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 position-relative" data-tab="notifications" title="Thông báo hệ thống">
+            <i class="fas fa-bell"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notifBadgeTop">0</span>
+          </button>
+
+          <!-- Avatar & Menu Tài Khoản Dropdown -->
+          <div class="dropdown">
+            <div class="user-pill-wrap" data-bs-toggle="dropdown" aria-expanded="false">
+              <span id="userTopAvatar">
+                <% if (user.anhDaiDien) { %>
+                  <img src="<%= user.anhDaiDien %>" class="rounded-circle" width="34" height="34" style="object-fit:cover;" onerror="this.onerror=null; this.src='/images/default-avatar.svg';">
+                <% } else { %>
+                  <span class="rounded-circle bg-warning text-white fw-bold d-inline-flex align-items-center justify-content-center" style="width:34px;height:34px;font-size:0.9rem;">
+                    <%= (user.hoTen || 'U').charAt(0).toUpperCase() %>
+                  </span>
+                <% } %>
+              </span>
+              <div class="d-none d-md-block text-start">
+                <div class="fw-bold small text-dark leading-none"><%= user.hoTen %></div>
+                <div class="text-muted" style="font-size:0.72rem;"><i class="fas fa-circle text-success me-1" style="font-size:7px;"></i>Trực tuyến</div>
+              </div>
+              <i class="fas fa-chevron-down text-muted small ms-1"></i>
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2" style="border-radius:14px; min-width: 220px;">
+              <li class="px-3 py-2 border-bottom">
+                <div class="fw-bold small text-dark"><%= user.hoTen %></div>
+                <div class="text-muted" style="font-size:0.75rem;"><%= user.email || user.soDienThoai %></div>
+              </li>
+              <li><a class="dropdown-item py-2 small" href="#profile" data-tab="profile"><i class="fas fa-user-circle me-2 text-warning"></i> Hồ sơ & Đổi ảnh đại diện</a></li>
+              <li><a class="dropdown-item py-2 small" href="#profile" data-tab="profile"><i class="fas fa-key me-2 text-info"></i> Đổi mật khẩu tài khoản</a></li>
+              <li><hr class="dropdown-divider my-1"></li>
+              <li><a class="dropdown-item py-2 small text-danger fw-semibold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trạng Thái Tải & Vùng Hiển Thị Nội Dung Chính -->
+      <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;"></div>
+        <div class="text-muted small mt-2">Đang tải dữ liệu trang...</div>
+      </div>
+      <div id="content"></div>
+    </div>
+  </div>
+
+  <!-- FORM MODAL ĐỘNG -->
+  <div class="modal fade" id="formModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <form class="modal-content border-0 shadow-lg" id="modalForm" novalidate style="border-radius: 18px;">
+        <div class="modal-header border-bottom px-4 py-3 bg-light" style="border-radius: 18px 18px 0 0;">
+          <h5 class="modal-title fw-bold" id="modalTitle"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="row g-3" id="modalBody"></div>
+          <div class="text-danger small mt-2 fw-semibold" id="modalError"></div>
+        </div>
+        <div class="modal-footer border-top px-4 py-3 bg-light" style="border-radius: 0 0 18px 18px;">
+          <button type="button" class="btn btn-light fw-semibold px-3" data-bs-dismiss="modal">Hủy</button>
+          <button class="btn btn-warning fw-bold px-4" id="modalSubmit" style="background:var(--honey-gradient); border:none; color:#fff;">Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- IMAGE VIEWER MODAL -->
+  <div class="modal fade" id="imageViewerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-transparent border-0 text-center">
+        <div class="position-relative d-inline-block m-auto">
+          <button type="button" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-2" data-bs-dismiss="modal"><i class="fas fa-times"></i></button>
+          <img id="viewerImage" src="" class="img-fluid rounded-3 shadow-lg" style="max-height: 80vh; object-fit: contain;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-area"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // ================= KHỞI TẠO BIẾN & TRẠNG THÁI =================
+    const ROLE = '<%= user.vaiTro %>';
+    const IS_LANDOWNER = ROLE === 'chudat';
+    const API = '/api/mobile';
+    const CURRENT_USER = {
+      id: Number('<%= user.id %>'),
+      hoTen: '<%= user.hoTen %>',
+      vaiTro: ROLE,
+      email: '<%= user.email || "" %>',
+      soDienThoai: '<%= user.soDienThoai || "" %>',
+      anhDaiDien: '<%= user.anhDaiDien || "" %>'
+    };
+
+    const state = {
+      tab: location.hash.slice(1) || 'overview',
+      data: {},
+      contracts: [],
+      available: [],
+      requests: [],
+      traces: [],
+      profile: {},
+      catalog: { flowers: [], bees: [] },
+      chat: {
+        conversations: [],
+        activePartnerId: null,
+        activePartner: null,
+        messages: [],
+        unreadCount: 0
+      },
+      filters: {
+        keyword: '',
+        flower: '',
+        bee: '',
+        capacity: '',
+        price: ''
+      }
+    };
+
+    // ================= TIỆN ÍCH DỄ DÙNG =================
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const num = (v) => Number(v || 0).toLocaleString('vi-VN');
+    const money = (v) => (v == null || v === '' ? 'Thỏa thuận' : num(v) + ' đ');
+    const today = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
+
+    const STATUS_MAP = {
+      ChoDuyet: ['Chờ duyệt', 'bg-warning-subtle text-warning-emphasis border border-warning'],
+      ChoKhachKy: ['Chờ ký HĐ', 'bg-primary-subtle text-primary border border-primary'],
+      DaKy: ['Đã ký / Hiệu lực', 'bg-success-subtle text-success border border-success'],
+      HoanThanh: ['Đã hoàn tất', 'bg-success text-white'],
+      TuChoi: ['Từ chối', 'bg-danger-subtle text-danger border border-danger'],
+      DaHuy: ['Đã hủy', 'bg-secondary-subtle text-secondary border border-secondary'],
+      ChoDiemDuyet: ['Chờ kiểm duyệt', 'bg-warning-subtle text-warning-emphasis border border-warning'],
+      DaDuyet: ['Đã duyệt', 'bg-success-subtle text-success border border-success'],
+      'Lên lịch': ['Lên lịch', 'bg-primary-subtle text-primary border border-primary'],
+      'Đã hoàn thành': ['Đã hoàn tất', 'bg-success-subtle text-success border border-success'],
+      'Đang di chuyển': ['Đang di chuyển', 'bg-warning-subtle text-warning-emphasis border border-warning'],
+      'Hoàn thành': ['Hoàn tất', 'bg-success text-white']
+    };
+
+    const chip = (s) => {
+      const [label, cls] = STATUS_MAP[s] || [s || '—', 'bg-light text-secondary border'];
+      return `<span class="badge rounded-pill px-3 py-1 font-semibold ${cls}" style="font-size:0.78rem;">${esc(label)}</span>`;
+    };
+
+    const reputationBadge = (isNew, rating, count) => {
+      const c = Number(count || 0);
+      const r = Number(rating || 0);
+      const userIsNew = isNew === true || isNew === 1 || isNew === '1' || c === 0 || !r;
+      if (userIsNew) {
+        return `<span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size:0.75rem;" title="Người mới tham gia"><i class="fas fa-seedling me-1"></i> Người mới</span>`;
+      }
+      return `<span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1" style="font-size:0.75rem;" title="Uy tín: ${r.toFixed(1)}/5 sao"><i class="fas fa-star text-warning me-1"></i> <b>${r.toFixed(1)}</b>/5 (${c} ĐG)</span>`;
+    };
+
+    function toast(message, error = false) {
+      const el = document.createElement('div');
+      el.className = `toast-custom ${error ? 'error' : 'success'}`;
+      el.innerHTML = `
+        <i class="fas ${error ? 'fa-circle-exclamation text-danger' : 'fa-check-circle text-success'} fs-5"></i>
+        <div class="flex-grow-1 small fw-bold text-dark">${esc(message)}</div>
+        <button type="button" class="btn-close btn-sm ms-2" onclick="this.closest('.toast-custom').remove()"></button>
+      `;
+      document.getElementById('toast-area').appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    function viewImage(url) {
+      if (!url) return;
+      document.getElementById('viewerImage').src = url;
+      new bootstrap.Modal(document.getElementById('imageViewerModal')).show();
+    }
+
+    // ================= API GỌI CHUẨN =================
+    async function api(method, path, body) {
+      const isFormData = body instanceof FormData;
+      const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+      const res = await fetch(API + path, {
+        method,
+        headers,
+        body: isFormData ? body : (body ? JSON.stringify(body) : undefined)
+      });
+      if (res.status === 401) { location.href = '/login'; throw new Error('Phiên đăng nhập đã hết hạn.'); }
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.success === false) throw new Error(json.message || 'Yêu cầu thất bại.');
+      return json;
+    }
+
+    async function act(method, path, body, confirmText) {
+      if (confirmText && !confirm(confirmText)) return false;
+      try {
+        const json = await api(method, path, body);
+        toast(json.message || 'Thao tác thành công');
+        await load();
+        return json;
+      } catch (e) {
+        toast(e.message, true);
+        return false;
+      }
+    }
+
+    // ================= TẢI TOÀN BỘ DỮ LIỆU =================
+    async function load() {
+      try {
+        if (IS_LANDOWNER) {
+          const [dash, profile, flowers, bees] = await Promise.all([
+            api('GET', '/landowner/dashboard'),
+            api('GET', '/profile').catch(() => ({ data: {} })),
+            api('GET', '/catalog/flowers').catch(() => ({ data: [] })),
+            api('GET', '/catalog/bees').catch(() => ({ data: [] }))
+          ]);
+          state.data = dash.data || {};
+          state.contracts = dash.data.contracts || [];
+          state.profile = profile.data || {};
+          state.catalog.flowers = flowers.data || [];
+          state.catalog.bees = bees.data || [];
+        } else {
+          const [dash, contracts, available, requests, traces, profile, flowers, bees] = await Promise.all([
+            api('GET', '/beekeeping/dashboard'),
+            api('GET', '/contracts'),
+            api('GET', '/beekeeping/locations'),
+            api('GET', '/beekeeping/rental-requests'),
+            api('GET', '/beekeeping/traces'),
+            api('GET', '/profile').catch(() => ({ data: {} })),
+            api('GET', '/catalog/flowers').catch(() => ({ data: [] })),
+            api('GET', '/catalog/bees').catch(() => ({ data: [] }))
+          ]);
+          state.data = dash.data || {};
+          state.contracts = contracts.data || [];
+          state.available = available.data || [];
+          state.requests = requests.data || [];
+          state.traces = traces.data || [];
+          state.profile = profile.data || {};
+          state.catalog.flowers = flowers.data || [];
+          state.catalog.bees = bees.data || [];
+        }
+
+        // Cập nhật uy tín trên Header
+        if (state.profile.uyTin != null || state.profile.laNguoiMoi) {
+          document.getElementById('headerReputationBadge').innerHTML = reputationBadge(state.profile.laNguoiMoi, state.profile.uyTin, state.profile.tongDanhGia);
+        }
+
+        // Cập nhật Avatar trên Header nếu có
+        if (state.profile.avatar || state.profile.anhDaiDien) {
+          const ava = state.profile.avatar || state.profile.anhDaiDien;
+          document.getElementById('userTopAvatar').innerHTML = `<img src="${ava}" class="rounded-circle" width="34" height="34" style="object-fit:cover;">`;
+        }
+
+        // Cập nhật badge chuông thông báo
+        const unreadNotif = state.data.summary?.unreadNotifications || 0;
+        const notifBadge = document.getElementById('notifBadgeTop');
+        if (notifBadge) {
+          notifBadge.textContent = unreadNotif;
+          notifBadge.classList.toggle('d-none', !unreadNotif);
+        }
+
+        renderNavBar();
+        render();
+        loadChatBadge();
+      } catch (e) {
+        toast(e.message, true);
+      } finally {
+        document.getElementById('loading').classList.add('d-none');
+      }
+    }
+
+    async function loadChatBadge() {
+      try {
+        const res = await fetch('/api/chat/danh-sach');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          let count = 0;
+          json.data.forEach(c => count += Number(c.soTinChuaDoc || 0));
+          state.chat.unreadCount = count;
+          const badge = document.getElementById('chatBadgeTop');
+          if (badge) {
+            badge.textContent = count;
+            badge.classList.toggle('d-none', !count);
+          }
+          renderNavBar();
+        }
+      } catch (_) {}
+    }
+
+    // ================= DANH MỤC ĐIỀU HƯỚNG SIDEBAR CHUẨN ADMIN =================
+    const MENU_SECTIONS_LANDOWNER = [
+      {
+        header: 'Tổng Quan',
+        items: [
+          { key: 'overview', icon: 'fa-chart-pie', label: 'Dashboard Thống Kê' }
+        ]
+      },
+      {
+        header: 'Quản Lý Vườn Đất',
+        items: [
+          { key: 'locations', icon: 'fa-mountain-sun', label: 'Vườn của tôi' },
+          { key: 'requests', icon: 'fa-file-signature', label: 'Yêu cầu thuê đất', badgeKey: 'pendingRequests' },
+          { key: 'hives', icon: 'fa-hive', label: 'Đàn ong trên đất' }
+        ]
+      },
+      {
+        header: 'Hợp Đồng & Mật Hoa',
+        items: [
+          { key: 'contracts', icon: 'fa-handshake-simple', label: 'Hợp đồng thuê đất', badgeKey: 'activeContracts' },
+          { key: 'production', icon: 'fa-droplet', label: 'Sản lượng mật' }
+        ]
+      },
+      {
+        header: 'Kết Nối & Tương Tác',
+        items: [
+          { key: 'chat', icon: 'fa-comments', label: 'Tin nhắn trao đổi', badgeKey: 'unreadChat' },
+          { key: 'notifications', icon: 'fa-bell', label: 'Thông báo', badgeKey: 'unreadNotif' }
+        ]
+      },
+      {
+        header: 'Cá Nhân',
+        items: [
+          { key: 'profile', icon: 'fa-user-gear', label: 'Hồ sơ & Đổi mật khẩu' }
+        ]
+      }
+    ];
+
+    const MENU_SECTIONS_BEEKEEPER = [
+      {
+        header: 'Tổng Quan',
+        items: [
+          { key: 'overview', icon: 'fa-chart-pie', label: 'Dashboard Đàn Ong' }
+        ]
+      },
+      {
+        header: 'Quản Lý Đàn Ong',
+        items: [
+          { key: 'hives', icon: 'fa-hive', label: 'Đàn ong & Định vị GPS' },
+          { key: 'rent', icon: 'fa-magnifying-glass-location', label: 'Tìm đất đặt ong' },
+          { key: 'care', icon: 'fa-calendar-check', label: 'Lịch chăm sóc 48h', badgeKey: 'careDueSoon' },
+          { key: 'moves', icon: 'fa-route', label: 'Lịch di chuyển' }
+        ]
+      },
+      {
+        header: 'Hợp Đồng & Thu Hoạch',
+        items: [
+          { key: 'contracts', icon: 'fa-handshake-simple', label: 'Hợp đồng thuê', badgeKey: 'contractsToSign' },
+          { key: 'production', icon: 'fa-qrcode', label: 'Thu hoạch & Tem QR' }
+        ]
+      },
+      {
+        header: 'Kết Nối & Tương Tác',
+        items: [
+          { key: 'chat', icon: 'fa-comments', label: 'Tin nhắn trao đổi', badgeKey: 'unreadChat' },
+          { key: 'notifications', icon: 'fa-bell', label: 'Thông báo', badgeKey: 'unreadNotif' }
+        ]
+      },
+      {
+        header: 'Cá Nhân',
+        items: [
+          { key: 'profile', icon: 'fa-user-gear', label: 'Hồ sơ & Đổi mật khẩu' }
+        ]
+      }
+    ];
+
+    function renderNavBar() {
+      const sections = IS_LANDOWNER ? MENU_SECTIONS_LANDOWNER : MENU_SECTIONS_BEEKEEPER;
+      const s = state.data.summary || {};
+
+      const html = sections.map((sec) => {
+        const itemsHtml = sec.items.map((item) => {
+          let badgeVal = 0;
+          let badgeCls = 'bg-danger text-white';
+          if (item.badgeKey === 'pendingRequests') badgeVal = s.pendingRequests;
+          if (item.badgeKey === 'careDueSoon') { badgeVal = s.careDueSoon; badgeCls = 'bg-warning text-dark'; }
+          if (item.badgeKey === 'contractsToSign') badgeVal = s.contractsToSign;
+          if (item.badgeKey === 'unreadNotif') badgeVal = s.unreadNotifications;
+          if (item.badgeKey === 'unreadChat') badgeVal = state.chat.unreadCount;
+
+          const badgeHtml = badgeVal > 0 ? `<span class="menu-badge-counter badge ${badgeCls}">${badgeVal}</span>` : '';
+          const activeCls = state.tab === item.key ? 'active' : '';
+
+          return `
+            <li>
+              <a href="#${item.key}" class="${activeCls}" data-tab="${item.key}" title="${esc(item.label)}">
+                <span class="nav-icon-wrapper"><i class="fas ${item.icon}"></i></span>
+                <span class="nav-label-text">${esc(item.label)}</span>
+                ${badgeHtml}
+              </a>
+            </li>
+          `;
+        }).join('');
+
+        return `
+          <div class="menu-header-label">${esc(sec.header)}</div>
+          ${itemsHtml}
+        `;
+      }).join('');
+
+      const menuEl = document.getElementById('sidebarMenuNav');
+      if (menuEl) menuEl.innerHTML = html;
+
+      // Cập nhật số đếm trên topbar
+      const notifTop = document.getElementById('notifBadgeTop');
+      if (notifTop) {
+        const unread = Number(s.unreadNotifications || 0);
+        notifTop.textContent = unread;
+        notifTop.classList.toggle('d-none', !unread);
+      }
+      const chatTop = document.getElementById('chatBadgeTop');
+      if (chatTop) {
+        const unreadChat = Number(state.chat.unreadCount || 0);
+        chatTop.textContent = unreadChat;
+        chatTop.classList.toggle('d-none', !unreadChat);
+      }
+    }
+
+    function setTab(tab) {
+      state.tab = tab;
+      history.replaceState(null, '', '#' + tab);
+      renderNavBar();
+      render();
+
+      if (tab === 'notifications' && state.data.summary?.unreadNotifications) {
+        api('PUT', '/notifications/read', {}).then(() => {
+          document.getElementById('notifBadgeTop')?.classList.add('d-none');
+          if (state.data.summary) state.data.summary.unreadNotifications = 0;
+          renderNavBar();
+        }).catch(() => {});
+      }
+    }
+
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-tab]');
+      if (t) {
+        e.preventDefault();
+        setTab(t.dataset.tab);
+        // Tự động thu gọn sidebar trên mobile khi bấm chọn
+        if (window.innerWidth <= 992) {
+          document.getElementById('portalSidebar')?.classList.remove('show');
+          document.getElementById('sidebarBackdrop')?.classList.remove('show');
+        }
+      }
+    });
+
+    // Toggle Sidebar trên màn hình di động / tablet
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const sidebarEl = document.getElementById('portalSidebar');
+    const backdropEl = document.getElementById('sidebarBackdrop');
+    if (toggleBtn && sidebarEl && backdropEl) {
+      toggleBtn.onclick = () => {
+        sidebarEl.classList.toggle('show');
+        backdropEl.classList.toggle('show');
+      };
+      backdropEl.onclick = () => {
+        sidebarEl.classList.remove('show');
+        backdropEl.classList.remove('show');
+      };
+    }
+
+    // ================= BẢN ĐỒ =================
+    const maps = {};
+    function drawMap(id, points, opts = {}) {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      if (maps[id]) { maps[id].remove(); delete maps[id]; }
+      const map = L.map(el).setView([16.05, 108.2], 5);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+
+      const valid = points.filter((p) => p.lat && p.lng);
+      valid.forEach((p) => {
+        const marker = L.circleMarker([p.lat, p.lng], {
+          radius: p.radius || 10,
+          color: p.color || '#f59e0b',
+          fillColor: p.color || '#f59e0b',
+          fillOpacity: 0.85,
+          weight: 2
+        }).addTo(map).bindPopup(p.popup);
+        if (p.onClick) marker.on('click', p.onClick);
+      });
+
+      if (valid.length === 1) map.setView([valid[0].lat, valid[0].lng], 12);
+      if (valid.length > 1) map.fitBounds(valid.map((p) => [p.lat, p.lng]), { padding: [35, 35], maxZoom: 13 });
+      if (opts.onClick) map.on('click', (e) => opts.onClick(e.latlng));
+      maps[id] = map;
+      setTimeout(() => map.invalidateSize(), 80);
+      return map;
+    }
+
+    // ================= TỪ ĐIỂN VÙNG SINH THÁI VIỆT NAM =================
+    const VN_REGIONS = [
+      { keys: ['mộc châu', 'moc chau'], lat: 20.8465, lng: 104.6432, name: 'Huyện Mộc Châu, Sơn La', hoa: 'Hoa mận, Hoa mơ, Tam giác mạch, Hoa rừng Tây Bắc', ong: 'Ong nội (Apis cerana)', khiHau: 'Ôn đới núi cao mát mẻ (16°C - 24°C)' },
+      { keys: ['sơn la', 'son la'], lat: 21.3283, lng: 103.9148, name: 'Tỉnh Sơn La', hoa: 'Hoa mận, Hoa mơ, Cà phê Arabica, Hoa ban', ong: 'Ong nội (Apis cerana)', khiHau: 'Cận nhiệt đới vùng núi (18°C - 25°C)' },
+      { keys: ['đồng văn', 'dong van'], lat: 23.2789, lng: 105.3622, name: 'Huyện Đồng Văn, Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên đá khô lạnh, trong lành (14°C - 22°C)' },
+      { keys: ['mèo vạc', 'meo vac'], lat: 23.1633, lng: 105.4128, name: 'Huyện Mèo Vạc, Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên đá khô lạnh (15°C - 22°C)' },
+      { keys: ['hà giang', 'ha giang'], lat: 22.8233, lng: 104.9839, name: 'Tỉnh Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch, Hoa rừng', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên núi đá ôn đới (15°C - 23°C)' },
+      { keys: ['sa pa', 'sapa', 'lào cai', 'lao cai'], lat: 22.3364, lng: 103.8438, name: 'Thị xã Sa Pa, Lào Cai', hoa: 'Hoa thảo quả, Hoa đỗ quyên, Hoa đào mận', ong: 'Ong nội (Apis cerana)', khiHau: 'Ôn đới núi cao quanh năm mát lạnh (12°C - 20°C)' },
+      { keys: ['lục ngạn', 'luc ngan'], lat: 21.3654, lng: 106.5982, name: 'Huyện Lục Ngạn, Bắc Giang', hoa: 'Hoa vải thiều đặc sản, Hoa cam Lục Ngạn', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Nhiệt đới 4 mùa, mùa hoa ấm áp (22°C - 30°C)' },
+      { keys: ['bắc giang', 'bac giang'], lat: 21.2731, lng: 106.1946, name: 'Tỉnh Bắc Giang', hoa: 'Hoa vải thiều, Hoa nhãn, Hoa bạch đàn', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới gió mùa (22°C - 30°C)' },
+      { keys: ['hưng yên', 'hung yen'], lat: 20.6562, lng: 106.0511, name: 'Tỉnh Hưng Yên', hoa: 'Hoa nhãn lồng Phố Hiến, Hoa bưởi, Hoa táo', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Nhiệt đới ẩm gió mùa (22°C - 30°C)' },
+      { keys: ['hà nội', 'ha noi'], lat: 21.0285, lng: 105.8542, name: 'Thủ đô Hà Nội', hoa: 'Hoa nhãn, Hoa bưởi Diễn, Hoa sen Tây Hồ, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa ẩm (22°C - 31°C)' },
+      { keys: ['hòa bình', 'hoa binh'], lat: 20.8167, lng: 105.3333, name: 'Tỉnh Hòa Bình', hoa: 'Hoa cam Cao Phong, Hoa bưởi, Hoa rừng tự nhiên', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới ẩm vùng đồi núi (22°C - 28°C)' },
+      { keys: ['đà lạt', 'da lat'], lat: 11.9404, lng: 108.4583, name: 'Thành phố Đà Lạt, Lâm Đồng', hoa: 'Hoa cà phê Arabica, Hoa dã quỳ, Hoa thông, Hoa bơ', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Cao nguyên ôn đới quanh năm mát mẻ (16°C - 23°C)' },
+      { keys: ['bảo lộc', 'bao loc', 'lâm đồng', 'lam dong'], lat: 11.5458, lng: 107.8083, name: 'Tỉnh Lâm Đồng (Bảo Lộc)', hoa: 'Hoa cà phê, Hoa chè B\'lao, Hoa dâu tằm, Hoa sầu riêng', ong: 'Ong Ý & Ong nội', khiHau: 'Cao nguyên mát mẻ quanh năm (18°C - 25°C)' },
+      { keys: ['buôn ma thuột', 'buon ma thuot', 'đắk lắk', 'dak lak'], lat: 12.6667, lng: 108.0500, name: 'Tỉnh Đắk Lắk (Buôn Ma Thuột)', hoa: 'Hoa cà phê Robusta, Hoa cao su, Hoa điều, Hoa bơ', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Cao nguyên ôn hòa đất đỏ bazan (20°C - 28°C)' },
+      { keys: ['pleiku', 'gia lai'], lat: 13.9833, lng: 108.0000, name: 'Tỉnh Gia Lai (Pleiku)', hoa: 'Hoa cà phê, Hoa cao su, Hoa chè Biển Hồ', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Cao nguyên ôn hòa 2 mùa mưa nắng (20°C - 28°C)' },
+      { keys: ['bình phước', 'binh phuoc'], lat: 11.7512, lng: 106.9027, name: 'Tỉnh Bình Phước', hoa: 'Hoa điều thủ phủ, Hoa cao su, Hoa tràm bông vàng', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới nắng ấm Đông Nam Bộ (25°C - 33°C)' },
+      { keys: ['u minh', 'cà mau', 'ca mau'], lat: 9.1769, lng: 105.1500, name: 'Tỉnh Cà Mau (Rừng U Minh)', hoa: 'Hoa tràm rừng U Minh, Hoa đước, Hoa dừa nước', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Nhiệt đới ẩm Nam Bộ nắng ấm (27°C - 33°C)' },
+      { keys: ['bến tre', 'ben tre'], lat: 10.2433, lng: 106.3756, name: 'Tỉnh Bến Tre (Xứ Dừa)', hoa: 'Hoa dừa Bến Tre, Hoa nhãn, Hoa bưởi da xanh', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Nhiệt đới ẩm phù sa sông Tiền (27°C - 32°C)' }
+    ];
+
+    function findClosestRegion(lat, lng) {
+      let nearest = null;
+      let minDist = Infinity;
+      for (const reg of VN_REGIONS) {
+        const dLat = (reg.lat - lat) * 111;
+        const dLng = (reg.lng - lng) * 111 * Math.cos(lat * Math.PI / 180);
+        const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = reg;
+        }
+      }
+      return { region: nearest, distance: minDist };
+    }
+
+    // ================= NHẬN DIỆN SINH THÁI KHU VỰC (HOA, ONG, KHÍ HẬU) =================
+    function detectEcology(lat, lng, addressText = '') {
+      const raw = (addressText || '').toLowerCase();
+      const norm = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      if (raw.trim()) {
+        for (const reg of VN_REGIONS) {
+          const match = reg.keys.some(k => raw.includes(k) || norm.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+          if (match) {
+            return { khiHau: reg.khiHau, loaiHoa: reg.hoa, loaiOng: reg.ong, regionName: reg.name };
+          }
+        }
+      }
+
+      if (lat != null && !isNaN(lat) && lng != null && !isNaN(lng)) {
+        const closest = findClosestRegion(lat, lng);
+        if (closest.region && closest.distance <= 150) {
+          return { khiHau: closest.region.khiHau, loaiHoa: closest.region.hoa, loaiOng: closest.region.ong, regionName: closest.region.name };
+        }
+      }
+
+      let khiHau = 'Nhiệt đới gió mùa';
+      let loaiHoa = 'Hoa rừng tự nhiên, Hoa nhãn';
+      let loaiOng = 'Ong nội (Apis cerana)';
+      if (lat != null && !isNaN(lat)) {
+        if (lat >= 21.0) {
+          khiHau = 'Cận nhiệt đới / Ôn hòa 4 mùa';
+          loaiHoa = 'Hoa nhãn, Hoa vải, Hoa mận, Hoa rừng tự nhiên';
+          loaiOng = 'Ong nội & Ong Ý';
+        } else if (lat >= 16.0 && lat < 21.0) {
+          khiHau = 'Nhiệt đới gió mùa miền Trung';
+          loaiHoa = 'Hoa keo tràm, Hoa rừng tự nhiên';
+          loaiOng = 'Ong nội & Ong ngoại / Ong Ý';
+        } else if (lat >= 11.5 && lat < 16.0) {
+          khiHau = 'Cao nguyên ôn hòa đất đỏ bazan';
+          loaiHoa = 'Hoa cà phê, Hoa cao su, Hoa điều';
+          loaiOng = 'Ong Ý (Apis mellifera)';
+        } else {
+          khiHau = 'Nhiệt đới ẩm Nam Bộ nắng ấm';
+          loaiHoa = 'Hoa tràm, Hoa dừa, Cây ăn trái';
+          loaiOng = 'Ong Ý & Ong dú';
+        }
+      }
+
+      return { khiHau, loaiHoa, loaiOng, regionName: 'Việt Nam' };
+    }
+
+    
+    function generateAddressCandidates(input) {
+      const list = [];
+      const clean = (input || '').trim();
+      if (!clean) return list;
+      const stripped = clean
+        .replace(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*\s*,?\s*/i, '')
+        .replace(/^(số|số nhà|nhà số|hẻm|ngõ|ngách|thửa|lô)\s+[0-9A-Za-z\/\.\-]+\s*,?\s*/i, '')
+        .trim();
+      if (stripped && stripped !== clean) list.push(stripped);
+      const parts = clean.split(',').map(p => p.trim()).filter(Boolean);
+      if (parts.length >= 3) {
+        const withoutFirst = parts.slice(1).join(', ');
+        if (!list.includes(withoutFirst)) list.push(withoutFirst);
+        if (parts.length >= 4) {
+          const pStreet = parts[0].replace(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*\s*/i, '').trim();
+          const streetDistCity = [pStreet, parts[parts.length - 2], parts[parts.length - 1]].join(', ');
+          if (!list.includes(streetDistCity)) list.push(streetDistCity);
+          const communeDistCity = parts.slice(parts.length - 3).join(', ');
+          if (!list.includes(communeDistCity)) list.push(communeDistCity);
+        }
+        const distCity = parts.slice(parts.length - 2).join(', ');
+        if (!list.includes(distCity)) list.push(distCity);
+      }
+      if (!list.includes(clean)) list.push(clean);
+      return list;
+    }
+
+    async function findLocationCascade(address) {
+      const candidates = generateAddressCandidates(address);
+      for (const c of candidates) {
+        try {
+          const url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(c) + '&limit=3';
+          const res = await fetch(url, { signal: AbortSignal.timeout(2800) });
+          if (res.ok) {
+            const d = await res.json();
+            if (d && d.features && d.features.length) {
+              for (const f of d.features) {
+                const [lon, lat] = f.geometry.coordinates;
+                if (lat > 8.0 && lat < 24.0 && lon > 102.0 && lon < 110.0) {
+                  return { lat, lng: lon, matched: c };
+                }
+              }
+            }
+          }
+        } catch (e) {}
+      }
+      return null;
+    }
+
+    // ================= MODAL FORM ĐỘNG =================
+    const formModal = new bootstrap.Modal(document.getElementById('formModal'));
+    let activeModalSubmit = null;
+
+    function openForm(title, fields, onSubmit, submitLabel = 'Lưu thay đổi') {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalSubmit').textContent = submitLabel;
+      document.getElementById('modalError').textContent = '';
+
+      document.getElementById('modalBody').innerHTML = fields.map((f) => {
+        const col = `col-md-${f.col || 6}`;
+        const req = f.required ? 'required' : '';
+        const label = `<label class="form-label small fw-bold text-dark">${esc(f.label)}${f.required ? ' <span class="text-danger">*</span>' : ''}</label>`;
+
+        if (f.type === 'select') {
+          return `
+            <div class="${col}">
+              ${label}
+              <select class="form-select" name="${f.name}" ${req}>
+                ${f.options.map((o) => `<option value="${esc(o.value)}" ${String(o.value) === String(f.value ?? '') ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}
+              </select>
+            </div>
+          `;
+        }
+        if (f.type === 'textarea') {
+          return `
+            <div class="${col}">
+              ${label}
+              <textarea class="form-control" rows="3" name="${f.name}" ${req} placeholder="${esc(f.placeholder || '')}">${esc(f.value ?? '')}</textarea>
+            </div>
+          `;
+        }
+        if (f.type === 'image') {
+          return `
+            <div class="col-12">
+              ${label}
+              <div class="d-flex align-items-center gap-3">
+                <div class="border rounded-3 p-1 bg-light text-center" style="width: 85px; height: 85px;">
+                  <img id="formImgPreview" src="${f.value || '/images/default-garden.svg'}" class="w-100 h-100 rounded-2 object-fit-cover" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+                </div>
+                <div class="flex-grow-1">
+                  <input type="file" class="form-control form-control-sm mb-1" id="formImgInput" accept="image/*">
+                  <input type="hidden" name="${f.name}" id="formImgVal" value="${esc(f.value ?? '')}">
+                  <div class="form-text small">Chọn file hình ảnh thực tế từ điện thoại hoặc máy tính.</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        if (f.type === 'latlng') {
+          return `
+            <div class="col-12">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                ${label}
+                <button type="button" class="btn btn-xs btn-outline-warning text-dark fw-bold rounded-pill px-2 py-0" id="detectEcoBtn" style="font-size:0.75rem;">
+                  <i class="fas fa-wand-magic-sparkles text-warning me-1"></i> Gợi ý hoa & giống ong
+                </button>
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col"><input class="form-control form-control-sm" name="viDo" placeholder="Vĩ độ (Lat)" value="${esc(f.value?.lat ?? '')}" ${req}></div>
+                <div class="col"><input class="form-control form-control-sm" name="kinhDo" placeholder="Kinh độ (Lng)" value="${esc(f.value?.lng ?? '')}" ${req}></div>
+                <div class="col-auto">
+                  <button type="button" class="btn btn-sm btn-warning text-dark fw-bold shadow-sm" id="gpsBtn">
+                    <i class="fas fa-crosshairs me-1"></i> Lấy GPS tự động
+                  </button>
+                </div>
+              </div>
+              <div id="ecoAlertBox" class="alert alert-warning py-2 px-3 small mb-2 d-none rounded-3 border-0 shadow-sm" style="background:#fef3c7; color:#92400e;">
+                <i class="fas fa-wand-magic-sparkles text-amber me-1"></i>
+                <span id="ecoAlertText"></span>
+              </div>
+              <div id="pickMap" class="map-sm"></div>
+              <div class="form-text small mt-1"><i class="fas fa-info-circle text-primary me-1"></i> Bấm trực tiếp lên bản đồ để chọn vị trí. Hệ thống sẽ <b>tự động nhận diện loài hoa và loài ong</b> phù hợp nhất, bạn vẫn có thể <b>chỉnh sửa tùy ý</b>.</div>
+            </div>
+          `;
+        }
+
+        let chipsHtml = '';
+        if (f.chips && Array.isArray(f.chips) && f.chips.length) {
+          chipsHtml = `
+            <div class="d-flex flex-wrap gap-1 mt-1">
+              ${f.chips.map(c => `
+                <span role="button" class="badge rounded-pill bg-light text-dark border px-2 py-1 form-chip" data-input="${f.name}" data-val="${esc(c)}" style="font-size: 0.73rem; cursor: pointer;">
+                  <i class="fas fa-tag text-warning me-1"></i>${esc(c)}
+                </span>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        return `
+          <div class="${col}">
+            ${label}
+            <input class="form-control" type="${f.type || 'text'}" name="${f.name}" value="${esc(f.value ?? '')}" ${req}
+              placeholder="${esc(f.placeholder || '')}" ${f.min != null ? `min="${f.min}"` : ''} ${f.step ? `step="${f.step}"` : ''} ${f.list ? `list="dl-${f.name}"` : ''}>
+            ${f.list ? `<datalist id="dl-${f.name}">${f.list.map((v) => `<option value="${esc(v)}">`).join('')}</datalist>` : ''}
+            ${chipsHtml}
+          </div>
+        `;
+      }).join('');
+
+      activeModalSubmit = onSubmit;
+      formModal.show();
+
+      const imgInput = document.getElementById('formImgInput');
+      if (imgInput) {
+        imgInput.onchange = (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (re) => {
+            document.getElementById('formImgPreview').src = re.target.result;
+            document.getElementById('formImgVal').value = re.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
+      }
+
+      // Hỗ trợ bấm chip để điền giá trị nhanh
+      const modalBody = document.getElementById('modalBody');
+      modalBody.onclick = (e) => {
+        const chip = e.target.closest('.form-chip');
+        if (chip) {
+          const inputName = chip.dataset.input;
+          const inputVal = chip.dataset.val;
+          const inputEl = document.querySelector(`#modalForm [name="${inputName}"]`);
+          if (inputEl) {
+            inputEl.value = inputVal;
+            inputEl.focus();
+            toast(`Đã chọn: ${inputVal}`);
+          }
+        }
+      };
+
+      const picker = fields.find((f) => f.type === 'latlng');
+      if (picker) {
+        document.getElementById('formModal').addEventListener('shown.bs.modal', () => {
+          const form = document.getElementById('modalForm');
+          let marker = null;
+
+          const applyEcology = (lat, lng, showToast = false) => {
+            const flowerInput = form.querySelector('[name=loaiHoa]');
+            const beeInput = form.querySelector('[name=loaiOngPhuHop]');
+            const climateInput = form.querySelector('[name=khiHau]');
+            const addrInput = form.querySelector('[name=diaChiChiTiet]');
+            if (!flowerInput && !beeInput && !climateInput) return;
+
+            const addr = addrInput ? addrInput.value : '';
+            const eco = detectEcology(lat, lng, addr);
+            if (flowerInput) flowerInput.value = eco.loaiHoa;
+            if (beeInput) beeInput.value = eco.loaiOng;
+            if (climateInput) climateInput.value = eco.khiHau;
+
+            const alertBox = document.getElementById('ecoAlertBox');
+            const alertText = document.getElementById('ecoAlertText');
+            if (alertBox && alertText) {
+              alertText.innerHTML = `<strong>⚡ Nhận diện theo vị trí:</strong> Hoa phù hợp: <b>${esc(eco.loaiHoa)}</b> • Giống ong: <b>${esc(eco.loaiOng)}</b> • Khí hậu: <i>${esc(eco.khiHau)}</i>. <span class="d-block small text-muted mt-1">Bạn có thể tự do chỉnh sửa hoặc chọn gợi ý bên dưới nếu cần.</span>`;
+              alertBox.classList.remove('d-none');
+            }
+            if (showToast) {
+              toast('⚡ Đã tự động nhận diện loài hoa & giống ong theo tọa độ! Bạn có thể chỉnh sửa tùy ý.');
+            }
+          };
+
+          const set = (lat, lng, triggerEco = true) => {
+            const latInput = form.querySelector('[name=viDo]');
+            const lngInput = form.querySelector('[name=kinhDo]');
+            if (latInput) latInput.value = Number(lat).toFixed(6);
+            if (lngInput) lngInput.value = Number(lng).toFixed(6);
+            if (marker) marker.setLatLng([lat, lng]);
+            else marker = L.marker([lat, lng]).addTo(map);
+
+            if (triggerEco) {
+              applyEcology(lat, lng, true);
+            }
+          };
+
+          const start = picker.value?.lat ? [Number(picker.value.lat), Number(picker.value.lng)] : null;
+          const map = drawMap('pickMap', [], { onClick: (ll) => set(ll.lat, ll.lng, true) });
+          if (start) {
+            map.setView(start, 13);
+            set(start[0], start[1], false);
+          }
+
+          const gpsBtn = document.getElementById('gpsBtn');
+          if (gpsBtn) {
+            gpsBtn.onclick = () => navigator.geolocation
+              ? navigator.geolocation.getCurrentPosition((p) => {
+                set(p.coords.latitude, p.coords.longitude, true);
+                map.setView([p.coords.latitude, p.coords.longitude], 15);
+              }, (e) => toast('Không lấy được GPS: ' + e.message, true), { enableHighAccuracy: true, timeout: 12000 })
+              : toast('Trình duyệt không hỗ trợ GPS.', true);
+          }
+
+          const detectBtn = document.getElementById('detectEcoBtn');
+          if (detectBtn) {
+            detectBtn.onclick = () => {
+              const lat = parseFloat(form.querySelector('[name=viDo]')?.value);
+              const lng = parseFloat(form.querySelector('[name=kinhDo]')?.value);
+              applyEcology(isNaN(lat) ? null : lat, isNaN(lng) ? null : lng, true);
+            };
+          }
+
+          const addrInput = form.querySelector('[name=diaChiChiTiet]');
+          if (addrInput) {
+            addrInput.addEventListener('change', async () => {
+              const val = addrInput.value.trim();
+              if (val) {
+                const res = await findLocationCascade(val);
+                if (res && res.lat && res.lng) {
+                  set(res.lat, res.lng, true);
+                  map.setView([res.lat, res.lng], 14);
+                } else {
+                  const lat = parseFloat(form.querySelector('[name=viDo]')?.value);
+                  const lng = parseFloat(form.querySelector('[name=kinhDo]')?.value);
+                  applyEcology(isNaN(lat) ? null : lat, isNaN(lng) ? null : lng, false);
+                }
+              }
+            });
+          }
+        }, { once: true });
+      }
+    }
+
+    document.getElementById('modalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const values = Object.fromEntries(new FormData(form).entries());
+      const btn = document.getElementById('modalSubmit');
+      btn.disabled = true;
+      try {
+        const res = await activeModalSubmit(values);
+        formModal.hide();
+        toast(res?.message || 'Đã lưu thay đổi.');
+        await load();
+      } catch (err) {
+        document.getElementById('modalError').textContent = err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ================= GIAO DIỆN CHUNG =================
+    const statCard = (label, value, icon, colorCls, tab) => `
+      <div class="col-6 col-lg-3">
+        <div class="stat-card" ${tab ? `data-tab="${tab}" title="Bấm để xem chi tiết"` : ''}>
+          <div class="stat-card-top">
+            <span class="stat-title">${esc(label)}</span>
+            <div class="stat-icon-box ${colorCls}"><i class="fas ${icon}"></i></div>
+          </div>
+          <div class="stat-number">${value}</div>
+          <div class="small text-muted d-flex align-items-center gap-1" style="font-size:0.75rem;">
+            <i class="fas fa-arrow-trend-up text-success"></i> Cập nhật thời gian thực
+          </div>
+        </div>
+      </div>
+    `;
+
+    const section = (title, body, action = '') => `
+      <div class="card-modern">
+        <div class="card-header-modern">
+          <h3 class="card-title-modern">${title}</h3>
+          <div class="ms-auto">${action}</div>
+        </div>
+        ${body}
+      </div>
+    `;
+
+    const table = (head, rows, empty) => `
+      <div class="table-modern-wrap">
+        <div class="table-responsive">
+          <table class="table table-modern">
+            <thead>
+              <tr>${head.map((h) => `<th>${h}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+              ${rows.length ? rows.join('') : `<tr><td colspan="${head.length}" class="text-center text-muted py-5"><i class="fas fa-folder-open fs-2 d-block mb-2 opacity-50"></i>${empty}</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    // ================= RENDER TỪNG VIEW =================
+    function render() {
+      const views = IS_LANDOWNER ? LANDOWNER_VIEWS : BEEKEEPER_VIEWS;
+      const renderFn = views[state.tab] || views.overview;
+      document.getElementById('content').innerHTML = renderFn();
+      if (AFTER_RENDER[state.tab]) AFTER_RENDER[state.tab]();
+    }
+
+    // ================= NOTIFICATIONS VIEW =================
+    const notificationsView = () => section(
+      '<i class="fas fa-bell text-warning me-2"></i> Thông báo hệ thống',
+      `
+        <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+          <span class="text-muted small">Thông báo cập nhật tự động từ hợp đồng, yêu cầu thuê vườn và tin nhắn mới.</span>
+          <button class="btn btn-outline-warning btn-sm text-dark fw-bold rounded-pill px-3" onclick="markAllNotificationsRead()"><i class="fas fa-check-double text-warning me-1"></i> Đánh dấu đã đọc tất cả</button>
+        </div>
+        <div class="d-flex flex-column gap-2">
+          ${(state.data.notifications || []).map((n) => `
+            <div class="d-flex align-items-start gap-3 p-3 rounded-3 border ${n.daDoc ? 'bg-white opacity-75' : 'bg-warning-subtle border-warning shadow-sm'}">
+              <div class="stat-icon-box ${n.mucDo === 'Cao' ? 'rose' : 'amber'} flex-shrink-0" style="width:42px;height:42px;border-radius:12px;">
+                <i class="fas ${n.mucDo === 'Cao' ? 'fa-triangle-exclamation' : 'fa-bell'}"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h6 class="fw-bold mb-1 text-dark">${esc(n.tieuDe)}</h6>
+                  <span class="text-muted small" style="font-size:0.75rem;"><i class="far fa-clock me-1"></i>${esc(n.thoiGian)}</span>
+                </div>
+                <div class="small text-secondary">${esc(n.noiDung)}</div>
+              </div>
+            </div>
+          `).join('') || '<div class="text-center text-muted py-5"><i class="fas fa-bell-slash fs-2 d-block mb-2 opacity-50"></i>Bạn chưa có thông báo nào.</div>'}
+        </div>
+      `
+    );
+
+    // ================= PROFILE & REPUTATION VIEW =================
+    function profileView() {
+      const p = state.profile || {};
+      const ava = p.avatar || p.anhDaiDien || '';
+      const reviews = p.danhSachDanhGia || [];
+      const rating = Number(p.uyTin || 0);
+      const count = Number(p.tongDanhGia || 0);
+      const isNew = p.laNguoiMoi === 1 || p.laNguoiMoi === true || count === 0;
+
+      return `
+        <div class="row g-4">
+          <!-- Cột thông tin cá nhân & Điểm uy tín -->
+          <div class="col-lg-4">
+            <div class="card-modern text-center p-4">
+              <div class="position-relative d-inline-block mx-auto mb-3">
+                ${ava ? `<img src="${ava}" class="rounded-circle border border-3 border-warning shadow-sm" width="115" height="115" style="object-fit:cover;">` : `<div class="rounded-circle bg-warning text-white fw-bold d-inline-flex align-items-center justify-content-center border border-3 border-warning shadow-sm" style="width:115px;height:115px;font-size:2.8rem;">${(p.hoTen || 'U').charAt(0).toUpperCase()}</div>`}
+                <label for="profileAvatarFile" class="btn btn-dark btn-sm rounded-circle position-absolute bottom-0 end-0 shadow" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Bấm để đổi ảnh đại diện">
+                  <i class="fas fa-camera"></i>
+                </label>
+                <input type="file" id="profileAvatarFile" accept="image/*" class="d-none" onchange="uploadProfileAvatar(this)">
+              </div>
+              <h4 class="fw-bold text-dark mb-1">${esc(p.hoTen || CURRENT_USER.hoTen)}</h4>
+              <div class="text-muted small mb-2"><i class="fas fa-envelope me-1"></i>${esc(p.email || CURRENT_USER.email || 'Chưa cập nhật email')}</div>
+              <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                <span class="brand-role-pill ${IS_LANDOWNER ? 'chudat' : 'nuoiong'} px-3 py-1">
+                  <i class="fas ${IS_LANDOWNER ? 'fa-mountain-sun' : 'fa-certificate'}"></i>
+                  ${IS_LANDOWNER ? 'Chủ Đất & Vườn' : 'Người Nuôi Ong'}
+                </span>
+                <span class="badge rounded-pill bg-success-subtle text-success border border-success px-2 py-1 small">
+                  <i class="fas fa-check-circle me-1"></i> Hoạt động
+                </span>
+              </div>
+
+              <!-- Thẻ điểm uy tín đối tác -->
+              <div class="p-3 rounded-3 bg-light border text-start mb-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <span class="fw-bold small text-dark"><i class="fas fa-star text-warning me-1"></i> Điểm uy tín đối tác:</span>
+                  ${reputationBadge(isNew, rating, count)}
+                </div>
+                ${!isNew ? `
+                  <div class="d-flex align-items-baseline gap-2 mb-2">
+                    <span class="fs-2 fw-800 text-warning">${rating.toFixed(1)}</span>
+                    <span class="text-muted small">/ 5.0 sao (${count} đánh giá thực tế)</span>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-warning" style="width: ${(rating / 5) * 100}%"></div>
+                  </div>
+                ` : `
+                  <div class="small text-muted">Tài khoản mới tham gia hệ thống. Điểm sao sẽ tự động tăng dần khi bạn hoàn tất các hợp đồng thuê vườn.</div>
+                `}
+              </div>
+
+              <div class="text-muted text-start small border-top pt-3">
+                <div class="mb-1"><i class="fas fa-phone text-secondary me-2"></i><b>Số điện thoại:</b> ${esc(p.soDienThoai || CURRENT_USER.soDienThoai || 'Chưa có')}</div>
+                <div><i class="fas fa-calendar-check text-secondary me-2"></i><b>Ngày tham gia:</b> ${esc(p.ngayTao || '2026')}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột Form Chỉnh Sửa & Đổi Mật Khẩu -->
+          <div class="col-lg-8">
+            <!-- Form thông tin cá nhân -->
+            <div class="card-modern mb-4">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-user-pen text-warning me-2"></i> Cập nhật thông tin cá nhân</h5>
+              <form id="profileEditForm" onsubmit="handleUpdateProfile(event)">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Họ và tên *</label>
+                    <input class="form-control" name="hoTen" value="${esc(p.hoTen || CURRENT_USER.hoTen)}" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Số điện thoại *</label>
+                    <input class="form-control" name="soDienThoai" value="${esc(p.soDienThoai || CURRENT_USER.soDienThoai)}" required>
+                  </div>
+                  <div class="col-md-12">
+                    <label class="form-label small fw-bold">Địa chỉ Email</label>
+                    <input class="form-control" type="email" name="email" value="${esc(p.email || CURRENT_USER.email)}" placeholder="vidu@gmail.com">
+                  </div>
+                </div>
+                <div class="mt-3 text-end">
+                  <button type="submit" class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" style="background:var(--honey-gradient); border:none; color:#fff;">
+                    <i class="fas fa-floppy-disk me-1"></i> Lưu thông tin
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Form đổi mật khẩu -->
+            <div class="card-modern mb-4">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-key text-warning me-2"></i> Đổi mật khẩu tài khoản</h5>
+              <form id="passwordEditForm" onsubmit="handleChangePassword(event)">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Mật khẩu hiện tại *</label>
+                    <div class="input-group">
+                      <input class="form-control" type="password" name="matKhauCu" id="pwdOld" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePwdVisibility('pwdOld')"><i class="fas fa-eye"></i></button>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Mật khẩu mới (ít nhất 6 ký tự) *</label>
+                    <div class="input-group">
+                      <input class="form-control" type="password" name="matKhauMoi" id="pwdNew" minlength="6" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePwdVisibility('pwdNew')"><i class="fas fa-eye"></i></button>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold">Xác nhận mật khẩu mới *</label>
+                    <div class="input-group">
+                      <input class="form-control" type="password" id="pwdConfirm" minlength="6" required>
+                      <button class="btn btn-outline-secondary" type="button" onclick="togglePwdVisibility('pwdConfirm')"><i class="fas fa-eye"></i></button>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3 text-end">
+                  <button type="submit" class="btn btn-outline-dark fw-bold px-4 rounded-pill">
+                    <i class="fas fa-shield-alt me-1"></i> Cập nhật mật khẩu
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Nhận xét từ đối tác đã thuê -->
+            <div class="card-modern">
+              <h5 class="fw-bold text-dark mb-3"><i class="fas fa-comments text-warning me-2"></i> Đánh giá từ đối tác gần đây</h5>
+              ${reviews.length ? reviews.map(r => `
+                <div class="p-3 rounded-3 border bg-light mb-2">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="fw-bold text-dark small">${esc(r.nguoiDanhGia || 'Đối tác')}</span>
+                      <span class="badge text-bg-warning"><i class="fas fa-star"></i> ${r.soSao}/5</span>
+                    </div>
+                    <span class="text-muted small" style="font-size:0.75rem;">${esc(r.ngayTao)}</span>
+                  </div>
+                  <div class="small text-secondary fst-italic">“${esc(r.nhanXet || 'Không có nhận xét thêm.')}”</div>
+                </div>
+              `).join('') : '<div class="text-muted small text-center py-4">Chưa có đánh giá nào từ các đợt thuê trước.</div>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+      try {
+        await api('PUT', '/profile', data);
+        toast('Cập nhật thông tin thành công!');
+        await load();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function handleChangePassword(e) {
+      e.preventDefault();
+      const oldP = document.getElementById('pwdOld').value.trim();
+      const newP = document.getElementById('pwdNew').value.trim();
+      const confP = document.getElementById('pwdConfirm').value.trim();
+
+      if (newP !== confP) return toast('Mật khẩu xác nhận không khớp!', true);
+      try {
+        await api('PUT', '/profile', { matKhauCu: oldP, matKhauMoi: newP });
+        toast('Đổi mật khẩu thành công!');
+        document.getElementById('passwordEditForm').reset();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function uploadProfileAvatar(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const fd = new FormData();
+      fd.append('avatar', file);
+      try {
+        toast('Đang tải lên ảnh đại diện...');
+        const res = await api('POST', '/profile/avatar', fd);
+        toast(res.message || 'Cập nhật ảnh đại diện thành công!');
+        await load();
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    function togglePwdVisibility(id) {
+      const el = document.getElementById(id);
+      if (el) el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // ================= TRUNG TÂM CHAT HUB =================
+    function chatView() {
+      return `
+        <div class="chat-layout">
+          <!-- Danh sách hội thoại bên trái -->
+          <div class="chat-sidebar-pane">
+            <div class="p-3 border-bottom bg-white">
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                <input class="form-control bg-light border-start-0" id="chatSearchInput" placeholder="Tìm kiếm đối tác..." oninput="handleChatSearch(this.value)">
+              </div>
+            </div>
+            <div class="overflow-y-auto flex-grow-1" id="chatConversationsList">
+              <div class="text-center text-muted py-5 small"><div class="spinner-border spinner-border-sm text-warning"></div> Đang tải danh sách...</div>
+            </div>
+          </div>
+
+          <!-- Khung chat bên phải -->
+          <div class="chat-main-pane" id="chatMainPane">
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center p-4 text-muted">
+              <div class="stat-icon-box amber mb-3" style="width:70px;height:70px;font-size:2rem;border-radius:20px;">
+                <i class="fas fa-comments"></i>
+              </div>
+              <h4 class="fw-bold text-dark">Trung tâm trò chuyện trực tiếp</h4>
+              <p class="small text-secondary max-w-sm" style="max-width:400px;">Chọn một cuộc trò chuyện từ danh sách bên trái để thương lượng hợp đồng thuê đất, trao đổi nguồn hoa và gửi ảnh thực tế của vườn.</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadChatConversations() {
+      try {
+        const res = await fetch('/api/chat/danh-sach');
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          state.chat.conversations = json.data;
+          renderChatConversationsList(json.data);
+        }
+      } catch (_) {}
+    }
+
+    function renderChatConversationsList(list) {
+      const el = document.getElementById('chatConversationsList');
+      if (!el) return;
+      if (!list.length) {
+        el.innerHTML = '<div class="text-center text-muted py-5 small">Chưa có cuộc trò chuyện nào.</div>';
+        return;
+      }
+
+      el.innerHTML = list.map((c) => {
+        const active = state.chat.activePartnerId === c.maDoiTac ? 'active' : '';
+        const unread = Number(c.soTinChuaDoc || 0);
+        return `
+          <div class="chat-list-item ${active}" onclick="openChatWith(${c.maDoiTac}, '${esc(c.tenDoiTac)}', '${esc(c.vaiTro || '')}', '${esc(c.soDienThoai || '')}', '${esc(c.anhDaiDien || '')}')">
+            <div class="position-relative flex-shrink-0">
+              ${c.anhDaiDien ? `<img src="${c.anhDaiDien}" class="rounded-circle" width="46" height="46" style="object-fit:cover;">` : `<div class="rounded-circle bg-warning text-white fw-bold d-inline-flex align-items-center justify-content-center" style="width:46px;height:46px;font-size:1.1rem;">${(c.tenDoiTac || 'U').charAt(0).toUpperCase()}</div>`}
+              <div class="position-absolute bottom-0 end-0 rounded-circle border border-white ${c.isOnline ? 'bg-success' : 'bg-secondary'}" style="width:12px;height:12px;"></div>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <span class="fw-bold small text-dark text-truncate">${esc(c.tenDoiTac)}</span>
+                ${unread > 0 ? `<span class="badge rounded-pill bg-danger" style="font-size:0.68rem;">${unread}</span>` : ''}
+              </div>
+              <div class="small text-muted text-truncate" style="font-size:0.78rem;">${esc(c.tinNhanCuoi || 'Bắt đầu trò chuyện...')}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function handleChatSearch(q) {
+      const query = (q || '').trim();
+      if (!query) {
+        renderChatConversationsList(state.chat.conversations);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/chat/tim-kiem-nguoi-dung?q=${encodeURIComponent(query)}`);
+        const json = await res.json();
+        if (json.success) {
+          const mapped = (json.data || []).map(u => ({
+            maDoiTac: u.maNguoiDung,
+            tenDoiTac: u.hoTen,
+            vaiTro: u.vaiTro,
+            soDienThoai: u.soDienThoai,
+            anhDaiDien: u.anhDaiDien,
+            tinNhanCuoi: 'Bắt đầu cuộc trò chuyện',
+            soTinChuaDoc: 0,
+            isOnline: u.isOnline
+          }));
+          renderChatConversationsList(mapped);
+        }
+      } catch (_) {}
+    }
+
+    async function openChatWith(partnerId, name, role, phone, avatar) {
+      state.chat.activePartnerId = partnerId;
+      state.chat.activePartner = { id: partnerId, name, role, phone, avatar };
+      renderChatConversationsList(state.chat.conversations);
+
+      const main = document.getElementById('chatMainPane');
+      if (!main) return;
+
+      main.innerHTML = `
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-white shadow-sm z-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="position-relative flex-shrink-0">
+              ${avatar ? `<img src="${avatar}" class="rounded-circle" width="44" height="44" style="object-fit:cover;">` : `<div class="rounded-circle bg-warning text-white fw-bold d-inline-flex align-items-center justify-content-center" style="width:44px;height:44px;font-size:1.1rem;">${(name || 'U').charAt(0).toUpperCase()}</div>`}
+              <div id="partnerOnlineDot" class="position-absolute bottom-0 end-0 rounded-circle border border-white bg-success" style="width:12px;height:12px;"></div>
+            </div>
+            <div>
+              <div class="fw-bold text-dark leading-tight">${esc(name)}</div>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="badge text-bg-light border text-secondary" style="font-size:0.72rem;">${role === 'admin' ? 'Quản trị viên' : (role === 'chuDat' ? 'Chủ Đất' : 'Người Nuôi Ong')}</span>
+                <span id="partnerOnlineStatus" class="small text-success" style="font-size:0.75rem;"><i class="fas fa-circle" style="font-size:7px;"></i> Đang hoạt động</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            ${phone ? `<a href="tel:${phone}" class="btn btn-sm btn-outline-success fw-bold rounded-pill px-3"><i class="fas fa-phone me-1"></i> Gọi ${phone}</a>` : ''}
+          </div>
+        </div>
+
+        <div class="chat-msg-area" id="chatMsgArea">
+          <div class="text-center text-muted py-5 small"><div class="spinner-border spinner-border-sm text-warning"></div> Đang tải tin nhắn...</div>
+        </div>
+
+        <div class="chat-input-bar">
+          <label for="chatImgFile" class="btn btn-light rounded-circle text-muted" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Gửi ảnh">
+            <i class="fas fa-image fs-5"></i>
+          </label>
+          <input type="file" id="chatImgFile" accept="image/*" class="d-none" onchange="sendChatImage(this)">
+          <input type="text" class="form-control rounded-pill px-3 py-2" id="chatTextInput" placeholder="Nhập tin nhắn trò chuyện..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+          <button class="btn btn-warning rounded-circle fw-bold shadow-sm" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:var(--honey-gradient);border:none;color:#fff;" onclick="sendChatMessage()" title="Gửi">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      `;
+
+      await fetchChatHistory();
+    }
+
+    async function fetchChatHistory() {
+      if (!state.chat.activePartnerId) return;
+      try {
+        const res = await fetch(`/api/chat/lich-su?maNguoiNhan=${state.chat.activePartnerId}`);
+        const json = await res.json();
+        if (json.success) {
+          state.chat.messages = json.data || [];
+          renderChatMessages();
+
+          const dot = document.getElementById('partnerOnlineDot');
+          const txt = document.getElementById('partnerOnlineStatus');
+          if (dot && txt) {
+            dot.className = `position-absolute bottom-0 end-0 rounded-circle border border-white ${json.partnerOnline ? 'bg-success' : 'bg-secondary'}`;
+            txt.className = `small ${json.partnerOnline ? 'text-success' : 'text-muted'}`;
+            txt.innerHTML = json.partnerOnline ? '<i class="fas fa-circle" style="font-size:7px;"></i> Đang hoạt động' : '<i class="fas fa-circle" style="font-size:7px;"></i> Ngoại tuyến';
+          }
+        }
+      } catch (_) {}
+    }
+
+    function renderChatMessages() {
+      const area = document.getElementById('chatMsgArea');
+      if (!area) return;
+      const msgs = state.chat.messages || [];
+      if (!msgs.length) {
+        area.innerHTML = '<div class="text-center text-muted py-5 small">Chưa có tin nhắn nào. Hãy gửi lời chào đầu tiên!</div>';
+        return;
+      }
+
+      area.innerHTML = msgs.map((m) => {
+        const isMine = m.maNguoiGui === CURRENT_USER.id;
+        const time = m.ngayGui ? new Date(m.ngayGui).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '';
+        const isRecall = m.daThuHoi === true || m.daThuHoi === 1;
+
+        let contentHtml = '';
+        if (isRecall) {
+          contentHtml = '<span class="fst-italic opacity-75"><i class="fas fa-ban me-1"></i> Tin nhắn đã được thu hồi</span>';
+        } else if (m.noiDung && (m.noiDung.startsWith('[HÌNH_ẢNH]:') || m.noiDung.startsWith('📷 [Ảnh]:') || m.noiDung.startsWith('/uploads/chat/'))) {
+          const imgUrl = m.noiDung.replace(/^[^\:]+\:\s*/, '').trim();
+          contentHtml = `<img src="${imgUrl}" class="rounded-3 shadow-sm img-fluid" style="max-height:220px; cursor:pointer;" onclick="viewImage('${imgUrl}')">`;
+        } else {
+          contentHtml = esc(m.noiDung);
+        }
+
+        return `
+          <div class="chat-bubble ${isMine ? 'mine' : 'theirs'} position-relative">
+            <div>${contentHtml}</div>
+            <div class="chat-bubble-time d-flex align-items-center justify-content-end gap-1">
+              <span>${time}</span>
+              ${isMine && !isRecall ? `<button class="btn btn-link p-0 text-white opacity-75 ms-1" style="font-size:0.7rem;" onclick="recallMessage(${m.id || m.maTinNhan})" title="Thu hồi"><i class="fas fa-rotate-left"></i></button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      area.scrollTop = area.scrollHeight;
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chatTextInput');
+      const text = (input?.value || '').trim();
+      if (!text || !state.chat.activePartnerId) return;
+      input.value = '';
+
+      try {
+        const res = await fetch('/api/chat/gui', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ maNguoiNhan: state.chat.activePartnerId, noiDung: text })
+        });
+        const json = await res.json();
+        if (json.success) {
+          await fetchChatHistory();
+          await loadChatConversations();
+        } else {
+          toast(json.message || 'Lỗi gửi tin', true);
+        }
+      } catch (err) {
+        toast('Không thể gửi tin nhắn', true);
+      }
+    }
+
+    async function sendChatImage(input) {
+      const file = input.files[0];
+      if (!file || !state.chat.activePartnerId) return;
+      const fd = new FormData();
+      fd.append('image', file);
+
+      try {
+        toast('Đang gửi hình ảnh...');
+        const upRes = await fetch('/api/chat/upload-anh', { method: 'POST', body: fd });
+        const upJson = await upRes.json();
+        if (!upJson.success) throw new Error(upJson.message || 'Lỗi tải ảnh');
+
+        const sendRes = await fetch('/api/chat/gui', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ maNguoiNhan: state.chat.activePartnerId, noiDung: `[HÌNH_ẢNH]: ${upJson.imageUrl}` })
+        });
+        const sendJson = await sendRes.json();
+        if (sendJson.success) {
+          await fetchChatHistory();
+          await loadChatConversations();
+        }
+      } catch (err) {
+        toast(err.message, true);
+      }
+    }
+
+    async function recallMessage(id) {
+      if (!id || !confirm('Thu hồi tin nhắn này?')) return;
+      try {
+        const res = await fetch(`/api/chat/thu-hoi/${id}`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          toast('Đã thu hồi tin nhắn');
+          await fetchChatHistory();
+        } else {
+          toast(json.message || 'Lỗi thu hồi', true);
+        }
+      } catch (_) {}
+    }
+
+    // ================= HỢP ĐỒNG, KÝ OTP & ĐÁNH GIÁ 2 CHIỀU =================
+    function contractsView() {
+      const rows = state.contracts.map((c) => {
+        const myRating = IS_LANDOWNER ? c.saoChuDatDanhGia : c.saoNguoiNuoiOngDanhGia;
+        const partnerRating = IS_LANDOWNER ? c.saoNguoiNuoiOngDanhGia : c.saoChuDatDanhGia;
+        const canReview = c.trangThai === 'DaKy' || c.trangThai === 'HoanThanh';
+        const partnerId = IS_LANDOWNER ? c.maNguoiNuoiOng : c.maChuDat;
+        const partnerName = IS_LANDOWNER ? c.tenNguoiNuoiOng : c.tenChuDat;
+
+        let reviewBadges = '';
+        if (canReview) {
+          reviewBadges = `
+            <div class="mt-1 d-flex flex-wrap gap-1">
+              ${myRating ? `<span class="badge text-bg-warning"><i class="fas fa-star"></i> Bạn: ${myRating}/5</span>` : '<span class="badge text-bg-light border text-muted">Chưa đánh giá</span>'}
+              ${partnerRating ? `<span class="badge text-bg-info text-white"><i class="fas fa-star"></i> Đối tác: ${partnerRating}/5</span>` : ''}
+            </div>
+          `;
+        }
+
+        return `
+          <tr>
+            <td>
+              <div class="fw-bold text-dark fs-6">${esc(c.tenHopDong)}</div>
+              <div class="small text-muted font-monospace"><i class="fas fa-file-lines me-1"></i>${esc(c.maHopDong)}</div>
+              ${reviewBadges}
+            </td>
+            <td>
+              <div class="d-flex align-items-center flex-wrap">
+                <b class="text-dark">${esc(partnerName)}</b>
+                ${reputationBadge(IS_LANDOWNER ? c.laNguoiMoiNuoiOng : c.laNguoiMoiChuDat, IS_LANDOWNER ? c.uyTinNguoiNuoiOng : c.uyTinChuDat, IS_LANDOWNER ? c.tongDanhGiaNguoiNuoiOng : c.tongDanhGiaChuDat)}
+              </div>
+              <div class="small text-muted mt-1"><i class="fas fa-phone me-1"></i>${esc(IS_LANDOWNER ? c.sdtNguoiNuoiOng : c.sdtChuDat)}</div>
+            </td>
+            <td><b class="text-warning-emphasis fs-6">${money(c.giaThue)}</b></td>
+            <td class="small text-secondary font-semibold">${esc(c.thoiHan)}</td>
+            <td>
+              ${chip(c.trangThai)}
+              <div class="small text-muted mt-1" style="font-size:0.75rem;">${esc(c.ngayHoanThanh ? 'Hoàn tất: ' + c.ngayHoanThanh : (c.ngayKy ? 'Ký: ' + c.ngayKy : ''))}</div>
+            </td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-secondary rounded-pill px-2" target="_blank" href="/api/hop-dong/pdf/${encodeURIComponent(c.maHopDong)}" title="Tải file PDF hợp đồng"><i class="fas fa-file-pdf text-danger me-1"></i> Tải PDF</a>
+              ${partnerId ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-1" onclick="setTab('chat'); setTimeout(()=>openChatWith(${partnerId}, '${esc(partnerName)}', '${IS_LANDOWNER ? 'nguoiNuoiOng' : 'chuDat'}', '${esc(IS_LANDOWNER ? c.sdtNguoiNuoiOng : c.sdtChuDat)}'), 100)" title="Nhắn tin"><i class="fas fa-comment-dots me-1"></i> Nhắn tin</button>` : ''}
+              ${!IS_LANDOWNER && c.trangThai === 'ChoKhachKy' ? `<button class="btn btn-sm btn-warning rounded-pill px-3 ms-1 fw-bold shadow-sm" onclick="signContract('${esc(c.maHopDong)}')"><i class="fas fa-pen-nib me-1"></i> Ký xác nhận OTP</button>` : ''}
+              ${c.trangThai === 'DaKy' ? `<button class="btn btn-sm btn-success rounded-pill px-3 ms-1 fw-semibold" onclick="completeContract('${esc(c.maHopDong)}')"><i class="fas fa-circle-check me-1"></i> Hoàn tất đợt thuê</button>` : ''}
+              ${canReview ? `<button class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 ms-1 fw-semibold" onclick="openReviewModal('${esc(c.maHopDong)}')"><i class="fas fa-star text-warning me-1"></i> ${myRating ? 'Sửa ĐG' : 'Đánh giá đối tác'}</button>` : ''}
+            </td>
+          </tr>
+        `;
+      });
+
+      return section(
+        '<i class="fas fa-handshake-simple text-warning me-2"></i> Danh sách hợp đồng thuê đất đặt ong',
+        table(['Hợp đồng', IS_LANDOWNER ? 'Người nuôi ong' : 'Chủ đất', 'Giá thuê', 'Thời hạn', 'Trạng thái', 'Thao tác'], rows,
+          IS_LANDOWNER ? 'Hợp đồng được tạo tự động khi bạn duyệt yêu cầu thuê vườn.' : 'Hợp đồng được tạo khi chủ đất duyệt yêu cầu thuê của bạn.')
+      );
+    }
+
+    async function completeContract(id) {
+      if (!confirm(`Xác nhận hoàn tất đợt thuê theo hợp đồng ${id}? Bạn và đối tác có thể gửi đánh giá 2 chiều cho nhau.`)) return;
+      try {
+        const res = await api('PUT', `/contracts/${encodeURIComponent(id)}/complete`);
+        toast(res.message || 'Đã hoàn tất hợp đồng.');
+        await load();
+        openReviewModal(id);
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function openReviewModal(id) {
+      try {
+        const reviewsRes = await api('GET', `/contracts/${encodeURIComponent(id)}/reviews`);
+        const reviews = reviewsRes.data || [];
+        const myRole = IS_LANDOWNER ? 'chuDat' : 'nguoiNuoiOng';
+        const partnerRole = IS_LANDOWNER ? 'nguoiNuoiOng' : 'chuDat';
+        const myReview = reviews.find((r) => r.vaiTroDanhGia === myRole) || {};
+        const partnerReview = reviews.find((r) => r.vaiTroDanhGia === partnerRole);
+
+        const c = state.contracts.find((item) => item.maHopDong === id) || {};
+        const partnerName = IS_LANDOWNER ? (c.tenNguoiNuoiOng || 'Người nuôi ong') : (c.tenChuDat || 'Chủ đất');
+
+        let partnerAlert = '';
+        if (partnerReview) {
+          partnerAlert = `
+            <div class="col-12">
+              <div class="alert alert-info py-2 mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-bold"><i class="fas fa-comment-dots me-1"></i> Đánh giá từ ${esc(partnerName)}:</span>
+                  <span class="badge text-bg-warning">${partnerReview.soSao}/5 ⭐</span>
+                </div>
+                ${partnerReview.nhanXet ? `<div class="fst-italic small">“${esc(partnerReview.nhanXet)}”</div>` : '<div class="small text-muted">Không có nhận xét thêm.</div>'}
+                <div class="small text-muted mt-1" style="font-size:0.75rem;">${esc(partnerReview.ngayTao)}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        const fields = [
+          {
+            name: 'soSao', label: 'Mức độ hài lòng tổng thể (1 - 5 sao)', type: 'select', required: true, col: 12, value: myReview.soSao || 5, options: [
+              { value: 5, label: '⭐⭐⭐⭐⭐ 5/5 - Rất hài lòng & Tuyệt vời' },
+              { value: 4, label: '⭐⭐⭐⭐ 4/5 - Hài lòng & Tốt' },
+              { value: 3, label: '⭐⭐⭐ 3/5 - Bình thường / Tạm ổn' },
+              { value: 2, label: '⭐⭐ 2/5 - Chưa hài lòng' },
+              { value: 1, label: '⭐ 1/5 - Kém / Không khuyến khích' }
+            ]
+          },
+          {
+            name: 'tieuChi1', label: IS_LANDOWNER ? 'Ý thức giữ gìn vườn & bảo vệ cây cối' : 'Nguồn hoa, môi trường & độ an toàn vườn', type: 'select', required: true, col: 6, value: myReview.tieuChi1 || 5, options: [
+              { value: 5, label: '5/5 - Rất tốt' }, { value: 4, label: '4/5 - Tốt' }, { value: 3, label: '3/5 - Trung bình' }, { value: 2, label: '2/5 - Kém' }, { value: 1, label: '1/5 - Rất kém' }
+            ]
+          },
+          {
+            name: 'tieuChi2', label: IS_LANDOWNER ? 'Thực hiện đúng cam kết & thanh toán' : 'Thái độ hợp tác & hỗ trợ của chủ đất', type: 'select', required: true, col: 6, value: myReview.tieuChi2 || 5, options: [
+              { value: 5, label: '5/5 - Rất tốt' }, { value: 4, label: '4/5 - Tốt' }, { value: 3, label: '3/5 - Trung bình' }, { value: 2, label: '2/5 - Kém' }, { value: 1, label: '1/5 - Rất kém' }
+            ]
+          },
+          { name: 'nhanXet', label: 'Nhận xét & góp ý chi tiết cho đối tác', type: 'textarea', col: 12, value: myReview.nhanXet || '' }
+        ];
+
+        openForm(`Đánh giá đối tác ${partnerName} (HĐ: ${id})`, fields, async (v) => {
+          const res = await api('POST', `/contracts/${encodeURIComponent(id)}/review`, {
+            soSao: Number(v.soSao),
+            tieuChi1: Number(v.tieuChi1),
+            tieuChi2: Number(v.tieuChi2),
+            nhanXet: v.nhanXet.trim()
+          });
+          await load();
+          return res;
+        }, myReview.soSao ? 'Cập nhật đánh giá' : 'Gửi đánh giá');
+
+        if (partnerAlert) {
+          document.getElementById('modalBody').insertAdjacentHTML('afterbegin', partnerAlert);
+        }
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function signContract(id) {
+      try {
+        const c = state.contracts.find((item) => item.maHopDong === id) || {};
+        const isNew = c.laNguoiMoiChuDat === 1 || c.laNguoiMoiChuDat === true || !c.tongDanhGiaChuDat || c.tongDanhGiaChuDat == 0;
+        const rating = Number(c.uyTinChuDat || 5).toFixed(1);
+        const count = Number(c.tongDanhGiaChuDat || 0);
+        const ownerName = esc(c.tenChuDat || 'Chủ đất');
+        const ownerPhone = esc(c.sdtChuDat || '');
+
+        const otp = await api('POST', `/contracts/${encodeURIComponent(id)}/otp`);
+
+        let alertHtml = '';
+        if (isNew) {
+          alertHtml = `
+            <div class="col-12">
+              <div class="alert alert-warning py-2 mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-bold"><i class="fas fa-exclamation-triangle text-warning me-1"></i> Chủ đất: ${ownerName}</span>
+                  <span class="badge text-bg-success"><i class="fas fa-seedling"></i> Người mới</span>
+                </div>
+                <div class="small text-muted">⚠️ Chủ đất này là Người mới (chưa có đánh giá từ các đợt thuê trước). Bạn nên chủ động liên hệ thực tế ${ownerPhone ? `(${ownerPhone})` : ''} và khảo sát vườn trước khi ký hợp đồng!</div>
+              </div>
+            </div>
+          `;
+        } else {
+          alertHtml = `
+            <div class="col-12">
+              <div class="alert alert-success py-2 mb-2">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <span class="fw-bold"><i class="fas fa-shield-alt text-success me-1"></i> Chủ đất: ${ownerName}</span>
+                  <span class="badge text-bg-warning"><i class="fas fa-star"></i> ${rating}/5 (${count} ĐG)</span>
+                </div>
+                <div class="small text-muted">✨ Chủ đất đạt uy tín cao từ các hợp đồng thuê trước. Bạn có thể an tâm ký hợp đồng!</div>
+              </div>
+            </div>
+          `;
+        }
+
+        openForm('Ký hợp đồng điện tử ' + id, [
+          { name: 'otp', label: otp.data?.demoOtp ? `Mã OTP xác thực (Đã gửi vào Thông báo; thử nghiệm: ${otp.data.demoOtp})` : 'Nhập mã OTP 6 số đã gửi vào mục Thông báo', required: true, col: 12 }
+        ], (v) => api('PUT', `/contracts/${encodeURIComponent(id)}/sign`, { otp: v.otp.trim() }), 'Xác nhận ký điện tử');
+
+        if (alertHtml) {
+          document.getElementById('modalBody').insertAdjacentHTML('afterbegin', alertHtml);
+        }
+      } catch (e) { toast(e.message, true); }
+    }
+
+    // ================= PHẦN DÀNH CHO CHỦ ĐẤT =================
+    const LANDOWNER_VIEWS = {
+      overview() {
+        const s = state.data.summary || {};
+        return `
+          <!-- Welcome Hero Banner -->
+          <div class="welcome-hero">
+            <h2 class="welcome-title">Xin chào, ${esc(CURRENT_USER.hoTen)}! 🏡</h2>
+            <p class="welcome-sub">Chào mừng bạn đến với Cổng Quản Lý Vườn Đất. Nơi kết nối vườn cây ăn trái với các chủ trang trại nuôi ong, tăng thụ phấn cho cây và gia tăng thu nhập từ đất.</p>
+            
+            <!-- Quy trình 3 bước trực quan -->
+            <div class="step-roadmap">
+              <div class="step-item">
+                <div class="step-badge">1</div>
+                <span>Đăng thông tin vườn</span>
+              </div>
+              <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+              <div class="step-item">
+                <div class="step-badge">2</div>
+                <span>Duyệt người nuôi ong thuê</span>
+              </div>
+              <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+              <div class="step-item">
+                <div class="step-badge">3</div>
+                <span>Ký hợp đồng & Nhận tiền</span>
+              </div>
+            </div>
+
+            <!-- Các nút hành động chính to rõ ràng -->
+            <div class="d-flex flex-wrap gap-3">
+              <button class="quick-cta-btn amber" onclick="locationForm()">
+                <i class="fas fa-plus-circle fs-5"></i> Đăng địa điểm vườn mới
+              </button>
+              <button class="quick-cta-btn green" onclick="setTab('requests')">
+                <i class="fas fa-file-signature fs-5"></i> Duyệt yêu cầu thuê (${s.pendingRequests || 0})
+              </button>
+              <button class="quick-cta-btn light" onclick="setTab('chat')">
+                <i class="fas fa-comments fs-5"></i> Nhắn tin cho người nuôi ong
+              </button>
+            </div>
+          </div>
+
+          <!-- 8 Thẻ Thống Kê To Rõ -->
+          <div class="row g-3 mb-4">
+            ${statCard('Vườn của tôi', num(s.totalLocations) + ' vườn', 'fa-mountain-sun', 'emerald', 'locations')}
+            ${statCard('Chờ kiểm duyệt', num(s.waitingReview) + ' vườn', 'fa-hourglass-half', 'amber', 'locations')}
+            ${statCard('Yêu cầu thuê chờ duyệt', num(s.pendingRequests) + ' yêu cầu', 'fa-file-signature', 'rose', 'requests')}
+            ${statCard('Hợp đồng hiệu lực', num(s.activeContracts) + ' hợp đồng', 'fa-handshake-simple', 'sky', 'contracts')}
+            ${statCard('Đàn ong trên đất', num(s.hivesOnLand) + ' đàn', 'fa-hive', 'amber', 'hives')}
+            ${statCard('Tổng số thùng ong', num(s.boxesOnLand) + ' thùng', 'fa-box', 'emerald', 'hives')}
+            ${statCard('Sản lượng thu trên đất', num(s.productionKg) + ' kg', 'fa-droplet', 'sky', 'production')}
+            ${statCard('Thông báo mới', num(s.unreadNotifications) + ' tin', 'fa-bell', 'rose', 'notifications')}
+          </div>
+
+          <!-- Bản đồ trực quan -->
+          <div class="row g-3">
+            <div class="col-lg-8">
+              ${section('<i class="fas fa-map-location-dot text-warning me-2"></i> Bản đồ vườn & Đàn ong đang đặt trên đất', `
+                <div id="overviewMap" class="map-container"></div>
+                <div class="d-flex align-items-center gap-4 mt-2 small text-muted">
+                  <span><i class="fas fa-circle text-success me-1"></i> Vị trí vườn cây của bạn</span>
+                  <span><i class="fas fa-circle text-danger me-1"></i> Vị trí đàn ong đang gửi</span>
+                </div>
+              `)}
+            </div>
+            <div class="col-lg-4">
+              ${section('<i class="fas fa-clock-rotate-left text-warning me-2"></i> Yêu cầu thuê mới nhất', `
+                <div class="d-flex flex-column gap-2">
+                  ${(state.data.requests || []).slice(0, 4).map(r => `
+                    <div class="p-3 border rounded-3 bg-light">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="fw-bold text-dark fs-6">${esc(r.tenDiaDiem)}</span>
+                        ${chip(r.trangThai)}
+                      </div>
+                      <div class="small text-muted mb-2"><i class="fas fa-user text-warning me-1"></i>${esc(r.tenNguoiNuoiOng)} · ${num(r.soDanOng)} đàn</div>
+                      <div class="d-flex align-items-center justify-content-between pt-2 border-top">
+                        <span class="fw-bold text-warning-emphasis">${money(r.giaThueDuKien)}</span>
+                        <button class="btn btn-sm btn-warning fw-bold rounded-pill px-3" onclick="setTab('requests')">Xem xét ngay <i class="fas fa-arrow-right ms-1"></i></button>
+                      </div>
+                    </div>
+                  `).join('') || '<div class="text-center text-muted py-5 small">Chưa có yêu cầu thuê nào cần xử lý.</div>'}
+                </div>
+              `)}
+            </div>
+          </div>
+        `;
+      },
+
+      locations() {
+        const list = state.data.locations || [];
+        return section(
+          '<i class="fas fa-mountain-sun text-warning me-2"></i> Danh sách địa điểm vườn của tôi',
+          `
+            <div class="row g-3">
+              ${list.map(l => {
+                const img = (l.hinhAnh && l.hinhAnh.trim()) ? l.hinhAnh : '/images/default-garden.svg';
+                const percent = Math.min(100, Math.round(((l.soThung || 0) / (l.sucChuaToiDa || 1)) * 100));
+                return `
+                  <div class="col-md-6 col-xl-4">
+                    <div class="card-modern h-100 p-0 overflow-hidden d-flex flex-column border">
+                      <div class="position-relative" style="height: 170px; overflow: hidden;">
+                        <img src="${img}" class="w-100 h-100 object-fit-cover" alt="${esc(l.tenDiaDiem)}" onclick="viewImage('${img}')" style="cursor:pointer;" title="Bấm để xem ảnh lớn" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+                        <div class="position-absolute top-0 end-0 m-2">${chip(l.trangThaiKiemDuyet)}</div>
+                        ${l.giaThueThang ? `<div class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75 text-white fw-bold px-2 py-1"><i class="fas fa-tag me-1"></i>${num(l.giaThueThang)} đ/tháng</div>` : ''}
+                      </div>
+                      <div class="p-3 flex-grow-1 d-flex flex-column">
+                        <h5 class="fw-bold text-dark mb-1">${esc(l.tenDiaDiem)}</h5>
+                        <div class="small text-muted mb-2 text-truncate"><i class="fas fa-location-dot text-danger me-1"></i>${esc(l.diaChiChiTiet)}</div>
+                        
+                        <div class="row g-2 small text-secondary mb-3">
+                          <div class="col-6"><i class="fas fa-vector-square text-primary me-1"></i> Diện tích: <b>${num(l.dienTich)} ha</b></div>
+                          <div class="col-6"><i class="fas fa-seedling text-success me-1"></i> Hoa: <b>${esc(l.loaiHoa || 'Tự nhiên')}</b></div>
+                          <div class="col-6"><i class="fas fa-certificate text-warning me-1"></i> Ong: <b>${esc(l.loaiOngPhuHop || 'Mọi loài')}</b></div>
+                          <div class="col-6"><i class="fas fa-cloud-sun text-info me-1"></i> Khí hậu: <b>${esc(l.khiHau || 'Nhiệt đới')}</b></div>
+                        </div>
+
+                        <!-- Thanh đo sức chứa trực quan -->
+                        <div class="mt-auto pt-2 border-top">
+                          <div class="d-flex align-items-center justify-content-between small mb-1">
+                            <span class="text-muted">Đang đặt: <b>${num(l.soThung)} / ${num(l.sucChuaToiDa)} thùng</b></span>
+                            <span class="fw-bold text-warning">${percent}%</span>
+                          </div>
+                          <div class="progress" style="height: 7px;">
+                            <div class="progress-bar bg-warning" style="width: ${percent}%"></div>
+                          </div>
+                        </div>
+
+                        ${l.nguoiThue ? `<div class="small text-success mt-2 fw-bold"><i class="fas fa-handshake me-1"></i> Đang cho thuê: ${esc(l.nguoiThue)}</div>` : ''}
+                        ${l.lyDoTuChoi ? `<div class="small text-danger mt-2"><i class="fas fa-circle-exclamation me-1"></i> Lý do từ chối: ${esc(l.lyDoTuChoi)}</div>` : ''}
+                      </div>
+                      <div class="p-3 pt-0 d-flex align-items-center justify-content-end gap-2 border-top">
+                        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="locationForm(${l.maDiaDiem})" ${l.nguoiThue ? 'disabled title="Đang có hợp đồng hiệu lực"' : ''}><i class="fas fa-pen me-1"></i> Sửa</button>
+                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="act('DELETE','/landowner/locations/${l.maDiaDiem}',null,'Xóa địa điểm ${esc(l.tenDiaDiem)}?')"><i class="fas fa-trash me-1"></i> Xóa</button>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('') || '<div class="col-12 text-center text-muted py-5"><i class="fas fa-mountain-sun fs-2 d-block mb-2 opacity-50"></i>Bạn chưa đăng địa điểm vườn nào. Bấm nút "+ Đăng địa điểm vườn" bên trên để bắt đầu.</div>'}
+            </div>
+          `,
+          '<button class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" onclick="locationForm()" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-plus me-1"></i> Đăng địa điểm vườn mới</button>'
+        );
+      },
+
+      requests() {
+        const rows = (state.data.requests || []).map((r) => `
+          <tr>
+            <td>
+              <div class="fw-bold text-dark fs-6">${esc(r.tenDiaDiem)}</div>
+              <div class="small text-muted"><i class="far fa-clock me-1"></i>Ngày gửi: ${esc(r.ngayTao)}</div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center flex-wrap">
+                <b class="text-dark">${esc(r.tenNguoiNuoiOng)}</b>
+                ${reputationBadge(r.laNguoiMoiNuoiOng, r.uyTinNguoiNuoiOng, r.tongDanhGiaNguoiNuoiOng)}
+              </div>
+              <div class="small text-muted mt-1"><i class="fas fa-phone me-1"></i>${esc(r.sdtNguoiNuoiOng)}</div>
+            </td>
+            <td>
+              <div class="small text-dark font-monospace">${esc(r.thoiGianBatDau)} → ${esc(r.thoiGianKetThuc || '')}</div>
+              <div class="small text-primary fw-bold mt-1"><i class="fas fa-hive me-1"></i>${num(r.soDanOng)} đàn ong</div>
+            </td>
+            <td><b class="text-warning-emphasis fs-6">${money(r.giaThueDuKien)}</b></td>
+            <td>
+              ${chip(r.trangThai)}
+              ${r.ghiChu ? `<div class="small text-secondary fst-italic mt-1">“${esc(r.ghiChu)}”</div>` : ''}
+              ${r.lyDoTuChoi ? `<div class="small text-danger mt-1">Lý do: ${esc(r.lyDoTuChoi)}</div>` : ''}
+            </td>
+            <td class="text-end text-nowrap">
+              ${r.maNguoiNuoiOng ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1" onclick="setTab('chat'); setTimeout(()=>openChatWith(${r.maNguoiNuoiOng}, '${esc(r.tenNguoiNuoiOng)}', 'nguoiNuoiOng', '${esc(r.sdtNguoiNuoiOng)}'), 100)" title="Nhắn tin với người thuê"><i class="fas fa-comment-dots me-1"></i> Nhắn tin</button>` : ''}
+              ${r.trangThai === 'ChoDuyet' ? `
+                <button class="btn btn-sm btn-success fw-bold rounded-pill px-3" onclick="approveForm('${esc(r.maYeuCau)}')"><i class="fas fa-check me-1"></i> Duyệt cho thuê</button>
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 ms-1" onclick="rejectForm('${esc(r.maYeuCau)}')"><i class="fas fa-times me-1"></i> Từ chối</button>
+              ` : ''}
+            </td>
+          </tr>
+        `);
+
+        return section(
+          '<i class="fas fa-file-signature text-warning me-2"></i> Danh sách yêu cầu thuê vườn từ người nuôi ong',
+          table(['Vườn đặt ong', 'Người nuôi ong', 'Thời hạn & Đàn ong', 'Giá đề xuất', 'Trạng thái', 'Thao tác'], rows, 'Chưa có yêu cầu thuê đất nào.')
+        );
+      },
+
+      hives() {
+        const rows = (state.data.hives || []).map((h) => `
+          <tr>
+            <td>
+              <div class="fw-bold text-dark fs-6">${esc(h.tenDanOng)}</div>
+              <div class="small text-muted font-monospace">${esc(h.maDanOng)}</div>
+            </td>
+            <td><b class="text-dark">${esc(h.tenDiaDiem)}</b></td>
+            <td><b class="text-warning fs-6">${num(h.soThung)}</b> thùng</td>
+            <td><span class="badge text-bg-success px-3 py-1 font-semibold">${esc(h.tinhTrang || 'Khỏe mạnh')}</span></td>
+            <td>
+              <div class="fw-bold text-dark">${esc(h.tenNguoiNuoiOng)}</div>
+              <div class="small text-muted"><i class="fas fa-phone me-1"></i>${esc(h.sdtNguoiNuoiOng)}</div>
+            </td>
+            <td class="small text-secondary">${esc(h.ngayCapNhat)}</td>
+          </tr>
+        `);
+
+        return `
+          <div class="row g-3">
+            <div class="col-lg-5">
+              ${section('<i class="fas fa-map-pin text-warning me-2"></i> Bản đồ tọa độ', '<div id="hiveMap" class="map-container"></div>')}
+            </div>
+            <div class="col-lg-7">
+              ${section('<i class="fas fa-hive text-warning me-2"></i> Đàn ong đang đặt trên đất của tôi', table(['Tên đàn ong', 'Tại vườn', 'Số thùng', 'Tình trạng', 'Chủ sở hữu', 'Cập nhật'], rows, 'Chưa có đàn ong nào đang đặt trên đất.'))}
+            </div>
+          </div>
+        `;
+      },
+
+      production() {
+        const rows = (state.data.production || []).map((p) => `
+          <tr>
+            <td>${esc(p.ngay)}</td>
+            <td><b class="text-warning fs-6">${num(p.sanLuong)} ${esc(p.donVi)}</b></td>
+            <td><span class="badge text-bg-light border px-2 py-1">${esc(p.loaiMat)}</span></td>
+            <td>${esc(p.tenDiaDiem)}</td>
+            <td>${esc(p.tenNguoiNuoiOng || '')}</td>
+            <td>
+              ${p.maTruyXuat ? `<a target="_blank" class="fw-bold text-decoration-none text-primary" href="/truy-xuat-qr?ma=${p.maTruyXuat}"><i class="fas fa-qrcode me-1"></i>#${p.maTruyXuat}</a>` : '—'}
+            </td>
+          </tr>
+        `);
+
+        return section(
+          '<i class="fas fa-droplet text-warning me-2"></i> Sản lượng khai thác mật trên các vườn',
+          table(['Ngày thu hoạch', 'Sản lượng', 'Loại mật', 'Địa điểm vườn', 'Người khai thác', 'Mã lô QR'], rows, 'Chưa có sản lượng nào được ghi nhận.'),
+          `<span class="badge text-bg-warning p-2 fs-6 rounded-pill">Tổng thu hoạch: <b>${num(state.data.summary?.productionKg)} kg</b></span>`
+        );
+      },
+
+      contracts: contractsView,
+      chat: chatView,
+      notifications: notificationsView,
+      profile: profileView
+    };
+
+    function locationForm(id) {
+      const l = id ? state.data.locations.find((x) => x.maDiaDiem === id) : {};
+      const flowers = (state.catalog.flowers || []).map(f => f.tenLoaiHoa || f).filter(Boolean);
+      const bees = (state.catalog.bees || []).map(b => b.tenLoaiOng || b).filter(Boolean);
+
+      const defaultFlowers = ['Hoa Nhãn', 'Hoa Vải', 'Hoa Cà Phê', 'Hoa Bạc Hà', 'Hoa Keo', 'Hoa Tràm', 'Hoa Mận', 'Hoa Điều'];
+      const defaultBees = ['Ong nội (Apis cerana)', 'Ong ngoại / Ong Ý (Apis mellifera)', 'Ong dú (Stingless bee)'];
+
+      openForm(id ? 'Sửa thông tin địa điểm vườn' : 'Đăng địa điểm vườn đặt ong', [
+        { name: 'tenDiaDiem', label: 'Tên địa điểm / Tên vườn', required: true, value: l.tenDiaDiem, placeholder: 'VD: Vườn Nhãn Lồng Hưng Yên 5ha' },
+        { name: 'diaChiChiTiet', label: 'Địa chỉ chi tiết vườn', required: true, value: l.diaChiChiTiet, placeholder: 'Xã, Huyện, Tỉnh...' },
+        { name: 'dienTich', label: 'Diện tích (ha)', type: 'number', step: 'any', min: 0.01, required: true, value: l.dienTich },
+        { name: 'sucChuaToiDa', label: 'Sức chứa tối đa (thùng ong)', type: 'number', min: 1, required: true, value: l.sucChuaToiDa ?? 50 },
+        { name: 'giaThueThang', label: 'Giá thuê đề xuất (đồng/tháng)', type: 'number', min: 0, value: l.giaThueThang ?? 1000000 },
+        { name: 'loaiHoa', label: 'Loài hoa đặc trưng (Tự động nhận diện khi chọn tọa độ, có thể tự sửa)', value: l.loaiHoa, list: flowers.length ? flowers : defaultFlowers, chips: flowers.length ? flowers.slice(0, 8) : defaultFlowers },
+        { name: 'loaiOngPhuHop', label: 'Giống ong phù hợp (Tự động theo tọa độ, có thể tự sửa)', value: l.loaiOngPhuHop, list: bees.length ? bees : defaultBees, chips: bees.length ? bees : defaultBees },
+        { name: 'khiHau', label: 'Khí hậu khu vực (Tự động tính từ GPS/địa chỉ)', placeholder: 'Tự động tính từ tọa độ GPS...', value: l.khiHau },
+        { name: 'hinhAnh', label: 'Hình ảnh thực tế của vườn', type: 'image', value: l.hinhAnh },
+        { type: 'latlng', label: 'Tọa độ GPS vị trí vườn (Ghim trực tiếp trên bản đồ để tự động nhận diện)', required: true, value: l.viDo ? { lat: l.viDo, lng: l.kinhDo } : null },
+        { name: 'thongTinPhapLy', label: 'Thông tin pháp lý & quy định của vườn', type: 'textarea', col: 12, value: l.thongTinPhapLy, placeholder: 'Đất vườn nông nghiệp gia đình, có nguồn nước sạch, quy định phun thuốc BVTV...' }
+      ], (v) => {
+        const body = {
+          ...v,
+          dienTich: Number(v.dienTich),
+          sucChuaToiDa: Number(v.sucChuaToiDa),
+          viDo: Number(v.viDo),
+          kinhDo: Number(v.kinhDo),
+          giaThueThang: v.giaThueThang ? Number(v.giaThueThang) : null,
+          hinhAnh: v.hinhAnh || null
+        };
+        return id ? api('PUT', `/landowner/locations/${id}`, body) : api('POST', '/landowner/locations', body);
+      }, id ? 'Cập nhật & Gửi duyệt lại' : 'Đăng vườn & Gửi duyệt');
+    }
+
+    function approveForm(id) {
+      const r = state.data.requests.find((x) => x.maYeuCau === id) || {};
+      const isNew = r.laNguoiMoiNuoiOng === 1 || r.laNguoiMoiNuoiOng === true || !r.tongDanhGiaNuoiOng || r.tongDanhGiaNuoiOng == 0;
+      const rating = Number(r.uyTinNuoiOng || 5).toFixed(1);
+      const count = Number(r.tongDanhGiaNuoiOng || 0);
+      const bkName = esc(r.tenNguoiNuoiOng || 'Người nuôi ong');
+
+      let alertHtml = '';
+      if (isNew) {
+        alertHtml = `
+          <div class="col-12">
+            <div class="alert alert-warning py-2 mb-2">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="fw-bold"><i class="fas fa-info-circle text-warning me-1"></i> Người thuê: ${bkName}</span>
+                <span class="badge text-bg-success"><i class="fas fa-seedling"></i> Người mới</span>
+              </div>
+              <div class="small text-muted">⚠️ Người nuôi ong này là Người mới (chưa có đánh giá từ việc thuê trước). Bạn nên thỏa thuận kỹ lưỡng về bảo vệ cây trồng và tiền đặt cọc trước khi duyệt cho thuê!</div>
+            </div>
+          </div>
+        `;
+      } else {
+        alertHtml = `
+          <div class="col-12">
+            <div class="alert alert-success py-2 mb-2">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="fw-bold"><i class="fas fa-user-check text-success me-1"></i> Người thuê: ${bkName}</span>
+                <span class="badge text-bg-warning"><i class="fas fa-star"></i> ${rating}/5 (${count} ĐG)</span>
+              </div>
+              <div class="small text-muted">✨ Đối tác có uy tín tốt từ các chủ đất khác, đáng tin cậy để cho thuê.</div>
+            </div>
+          </div>
+        `;
+      }
+
+      openForm('Duyệt cho thuê: ' + r.tenDiaDiem, [
+        { name: 'giaThue', label: 'Giá thuê chốt (đồng/tháng)', type: 'number', min: 0, value: r.giaThueDuKien ?? '' },
+        { name: 'quyDinhBoiThuong', label: 'Quy định bồi thường & cam kết', value: 'Bồi thường theo thỏa thuận nếu gây thiệt hại cho cây trồng hoặc tài sản trên vườn.' }
+      ], (v) => api('PUT', `/landowner/rental-requests/${encodeURIComponent(id)}/approve`, { giaThue: v.giaThue ? Number(v.giaThue) : null, quyDinhBoiThuong: v.quyDinhBoiThuong }), 'Duyệt & Tạo hợp đồng điện tử');
+
+      if (alertHtml) {
+        document.getElementById('modalBody').insertAdjacentHTML('afterbegin', alertHtml);
+      }
+    }
+
+    function rejectForm(id) {
+      openForm('Từ chối yêu cầu thuê', [
+        { name: 'lyDo', label: 'Lý do từ chối (sẽ gửi thông báo đến người nuôi ong)', required: true, col: 12, placeholder: 'Vườn đang trong thời kỳ phun thuốc, đã kín chỗ...' }
+      ], (v) => api('PUT', `/landowner/rental-requests/${encodeURIComponent(id)}/reject`, { lyDo: v.lyDo }), 'Xác nhận từ chối');
+    }
+
+    // ================= PHẦN DÀNH CHO NGƯỜI NUÔI ONG =================
+    const hives = () => state.data.hives || [];
+    const hiveOptions = (optional) => [...(optional ? [{ value: '', label: '— Không gắn đàn ong —' }] : []), ...hives().map((h) => ({ value: h.maDanOng, label: `${h.tenDanOng} (${h.soThung} thùng)` }))];
+    const rentedOptions = () => [{ value: '', label: '— Vị trí riêng của tôi —' }, ...(state.data.rentedLocations || []).map((l) => ({ value: l.maDiaDiem, label: `${l.tenDiaDiem} (còn ${l.sucChuaToiDa - l.soThungDangDat} chỗ)` }))];
+    const findHive = (id) => hives().find((h) => h.maDanOng === id);
+
+    const BEEKEEPER_VIEWS = {
+      overview() {
+        const s = state.data.summary || {};
+        const due = (state.data.careSchedule || []).filter((c) => c.trangThai !== 'Đã hoàn thành').slice(0, 5);
+
+        return `
+          <!-- Welcome Hero Banner -->
+          <div class="welcome-hero">
+            <h2 class="welcome-title">Xin chào, ${esc(CURRENT_USER.hoTen)}! 🐝</h2>
+            <p class="welcome-sub">Chào mừng bạn đến với Cổng Người Nuôi Ong. Theo dõi vị trí các đàn ong, tìm kiếm vườn hoa nở rộ theo mùa, ghi sản lượng mật và tạo tem QR truy xuất nguồn gốc.</p>
+            
+            <!-- Quy trình 3 bước trực quan -->
+            <div class="step-roadmap">
+              <div class="step-item">
+                <div class="step-badge">1</div>
+                <span>Khai báo đàn ong</span>
+              </div>
+              <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+              <div class="step-item">
+                <div class="step-badge">2</div>
+                <span>Tìm vườn hoa nở rộ</span>
+              </div>
+              <div class="step-arrow"><i class="fas fa-chevron-right"></i></div>
+              <div class="step-item">
+                <div class="step-badge">3</div>
+                <span>Ký hợp đồng & Đặt ong</span>
+              </div>
+            </div>
+
+            <!-- Các nút hành động chính to rõ ràng -->
+            <div class="d-flex flex-wrap gap-3">
+              <button class="quick-cta-btn amber" onclick="hiveForm()">
+                <i class="fas fa-plus-circle fs-5"></i> Thêm đàn ong mới
+              </button>
+              <button class="quick-cta-btn green" onclick="setTab('rent')">
+                <i class="fas fa-magnifying-glass-location fs-5"></i> Tìm vườn hoa đặt ong
+              </button>
+              <button class="quick-cta-btn amber" onclick="productionForm()" style="background:linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                <i class="fas fa-droplet fs-5"></i> Ghi sản lượng mật
+              </button>
+              <button class="quick-cta-btn light" onclick="setTab('care')">
+                <i class="fas fa-calendar-check fs-5"></i> Việc cần chăm sóc (${s.careDueSoon || 0})
+              </button>
+            </div>
+          </div>
+
+          <!-- 8 Thẻ Thống Kê To Rõ -->
+          <div class="row g-3 mb-4">
+            ${statCard('Tổng đàn ong', num(s.totalHives) + ' đàn', 'fa-hive', 'amber', 'hives')}
+            ${statCard('Tổng số thùng ong', num(s.totalBoxes) + ' thùng', 'fa-box', 'emerald', 'hives')}
+            ${statCard('Việc chăm sóc 48h', num(s.careDueSoon) + ' việc', 'fa-calendar-check', 'rose', 'care')}
+            ${statCard('Tổng sản lượng mật', num(s.totalProductionKg) + ' kg', 'fa-droplet', 'sky', 'production')}
+            ${statCard('Hợp đồng chờ ký', num(s.contractsToSign) + ' HĐ', 'fa-pen-nib', 'rose', 'contracts')}
+            ${statCard('Hợp đồng hiệu lực', num(s.activeContracts) + ' HĐ', 'fa-handshake-simple', 'emerald', 'contracts')}
+            ${statCard('Yêu cầu chờ duyệt', num(s.pendingRequests) + ' yêu cầu', 'fa-file-signature', 'amber', 'rent')}
+            ${statCard('Đang di chuyển', num(s.activeMoves) + ' chuyến', 'fa-route', 'sky', 'moves')}
+          </div>
+
+          <!-- Bản đồ & Việc cần làm -->
+          <div class="row g-3">
+            <div class="col-lg-8">
+              ${section('<i class="fas fa-map-location-dot text-warning me-2"></i> Bản đồ phân bố đàn ong của bạn', `
+                <div id="overviewMap" class="map-container"></div>
+                <div class="d-flex align-items-center gap-4 mt-2 small text-muted">
+                  <span><i class="fas fa-circle text-warning me-1"></i> Vị trí các đàn ong của bạn</span>
+                  <span class="ms-auto"><i class="fas fa-hand-pointer text-primary me-1"></i> Bấm vào từng điểm trên bản đồ để xem chi tiết đàn.</span>
+                </div>
+              `)}
+            </div>
+            <div class="col-lg-4">
+              ${section('<i class="fas fa-calendar-check text-warning me-2"></i> Việc chăm sóc sắp tới', `
+                <div class="d-flex flex-column gap-2">
+                  ${due.map((c) => `
+                    <div class="p-3 border rounded-3 bg-light">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <b class="text-dark small">${esc(c.tenCongViec)}</b>
+                        <span class="badge text-bg-warning rounded-pill px-2" style="font-size:0.7rem;">${esc(c.ngay)}</span>
+                      </div>
+                      <div class="small text-muted mb-2"><i class="fas fa-hive text-warning me-1"></i>${esc(c.tenDanOng || c.diaDiem || '—')}</div>
+                      <div class="text-end">
+                        <button class="btn btn-sm btn-outline-success rounded-pill px-3 py-0" onclick="act('PUT','/beekeeping/care-log/${encodeURIComponent(c.maLich)}/status',{trangThai:'Đã hoàn thành'})"><i class="fas fa-check me-1"></i> Đã làm xong</button>
+                      </div>
+                    </div>
+                  `).join('') || '<div class="text-center text-muted py-5 small">Tuyệt vời! Bạn không có việc nào còn tồn đọng.</div>'}
+                </div>
+                <div class="mt-3 text-end">
+                  <button class="btn btn-sm btn-link text-warning text-decoration-none fw-bold" onclick="setTab('care')">Xem toàn bộ lịch chăm sóc <i class="fas fa-arrow-right ms-1"></i></button>
+                </div>
+              `)}
+            </div>
+          </div>
+        `;
+      },
+
+      hives() {
+        const rows = hives().map((h) => `
+          <tr>
+            <td>
+              <div class="fw-bold text-dark fs-6">${esc(h.tenDanOng)}</div>
+              <div class="small text-muted font-monospace">${esc(h.maDanOng)}</div>
+            </td>
+            <td><b class="text-warning fs-6">${num(h.soThung)}</b> thùng</td>
+            <td><span class="badge text-bg-success px-3 py-1 font-semibold">${esc(h.tinhTrang || 'Khỏe mạnh')}</span></td>
+            <td>
+              ${h.tenDiaDiem ? `<span class="badge text-bg-info text-white px-2 py-1"><i class="fas fa-mountain-sun me-1"></i>${esc(h.tenDiaDiem)}</span>` : `<span class="text-secondary">${esc(h.viTri || 'Vị trí riêng')}</span>`}
+            </td>
+            <td>
+              ${h.viDo ? `<span class="small font-monospace">${Number(h.viDo).toFixed(5)}, ${Number(h.kinhDo).toFixed(5)}</span>` : '<span class="badge text-bg-danger">Chưa có GPS</span>'}
+              <div class="small text-muted" style="font-size:0.75rem;">${esc(h.ngayCapNhat || '')}</div>
+            </td>
+            <td class="text-end text-nowrap">
+              <button class="btn btn-sm btn-outline-success rounded-pill px-3" title="Cập nhật tọa độ GPS" onclick="hiveGps('${esc(h.maDanOng)}')"><i class="fas fa-crosshairs me-1"></i> Định vị GPS</button>
+              <button class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-1" title="Sửa thông tin" onclick="hiveForm('${esc(h.maDanOng)}')"><i class="fas fa-pen me-1"></i> Sửa</button>
+              <button class="btn btn-sm btn-outline-danger rounded-pill px-2 ms-1" title="Xóa đàn ong" onclick="act('DELETE','/beekeeping/hives/${encodeURIComponent(h.maDanOng)}',null,'Xóa đàn ong ${esc(h.tenDanOng)}? Lịch sử sản lượng vẫn được giữ an toàn.')"><i class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+        `);
+
+        return `
+          <div class="row g-3">
+            <div class="col-lg-5">
+              ${section('<i class="fas fa-map-pin text-warning me-2"></i> Bản đồ tọa độ đàn ong', '<div id="hiveMap" class="map-container"></div>')}
+            </div>
+            <div class="col-lg-7">
+              ${section(
+                '<i class="fas fa-hive text-warning me-2"></i> Quản lý các đàn ong & thùng nuôi',
+                table(['Tên đàn ong', 'Số thùng', 'Tình trạng', 'Vị trí đặt', 'GPS', 'Thao tác'], rows, 'Chưa có đàn ong nào. Bấm nút "+ Thêm đàn ong" để bắt đầu.'),
+                '<button class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" onclick="hiveForm()" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-plus me-1"></i> Thêm đàn ong mới</button>'
+              )}
+            </div>
+          </div>
+        `;
+      },
+
+      care() {
+        const rows = (state.data.careSchedule || []).map((c) => {
+          const done = c.trangThai === 'Đã hoàn thành';
+          return `
+            <tr class="${done ? 'opacity-75' : ''}">
+              <td style="width: 45px;">
+                <input class="form-check-input" type="checkbox" style="width: 20px; height: 20px; cursor: pointer;" ${done ? 'checked' : ''} onchange="act('PUT','/beekeeping/care-log/${encodeURIComponent(c.maLich)}/status',{trangThai:this.checked?'Đã hoàn thành':'Lên lịch'})">
+              </td>
+              <td>
+                <div class="fw-bold fs-6 ${done ? 'task-done' : 'text-dark'}">${esc(c.tenCongViec)}</div>
+                ${c.ghiChu ? `<div class="small text-muted">${esc(c.ghiChu)}</div>` : ''}
+              </td>
+              <td class="small text-dark font-monospace">${esc(c.ngay)} ${esc(c.gio || '')}</td>
+              <td><span class="badge text-bg-warning px-2 py-1"><i class="fas fa-hive me-1"></i>${esc(c.tenDanOng || '—')}</span></td>
+              <td class="small text-secondary">${esc(c.diaDiem || '—')}</td>
+              <td>${chip(c.trangThai)}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="act('DELETE','/beekeeping/care-log/${encodeURIComponent(c.maLich)}',null,'Xóa công việc chăm sóc này?')"><i class="fas fa-trash me-1"></i> Xóa</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        return section(
+          '<i class="fas fa-calendar-check text-warning me-2"></i> Checklist lịch chăm sóc & vệ sinh thùng ong',
+          table(['Xong', 'Công việc cần làm', 'Thời gian', 'Đàn ong', 'Địa điểm', 'Trạng thái', 'Thao tác'], rows, 'Chưa có công việc nào được lên lịch.'),
+          '<button class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" onclick="careForm()" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-plus me-1"></i> Thêm công việc</button>'
+        );
+      },
+
+      moves() {
+        const rows = (state.data.movements || []).map((m) => {
+          const id = encodeURIComponent(m.maDiChuyen);
+          const open = m.trangThai === 'Lên lịch' || m.trangThai === 'Đang di chuyển';
+          return `
+            <tr>
+              <td class="small text-dark font-monospace">${esc(m.ngay)}</td>
+              <td><b class="text-dark fs-6">${esc(m.tenDanOng || '—')}</b></td>
+              <td>
+                <span class="badge text-bg-light border px-2 py-1">${esc(m.viTriDi)}</span>
+                <i class="fas fa-arrow-right text-warning mx-2"></i>
+                <span class="badge text-bg-success bg-opacity-25 text-success-emphasis border px-2 py-1">${esc(m.viTriDen)}</span>
+              </td>
+              <td class="small font-monospace">${esc(m.bienSo || '—')}</td>
+              <td>${chip(m.trangThai)}</td>
+              <td class="text-end text-nowrap">
+                ${open ? `
+                  ${m.trangThai === 'Lên lịch' ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="act('PUT','/beekeeping/move/${id}/status',{trangThai:'Đang di chuyển'})"><i class="fas fa-truck-fast me-1"></i> Bắt đầu di chuyển</button>` : ''}
+                  <button class="btn btn-sm btn-success rounded-pill px-3 ms-1" onclick="act('PUT','/beekeeping/move/${id}/status',{trangThai:'Hoàn thành'})"><i class="fas fa-check-circle me-1"></i> Đã tới nơi an toàn</button>
+                  <button class="btn btn-sm btn-outline-secondary rounded-pill px-2 ms-1" onclick="act('PUT','/beekeeping/move/${id}/status',{trangThai:'Đã hủy'},'Hủy chuyến di chuyển này?')">Hủy</button>
+                ` : ''}
+              </td>
+            </tr>
+          `;
+        });
+
+        return section(
+          '<i class="fas fa-route text-warning me-2"></i> Lịch di chuyển đàn ong đón mùa hoa',
+          table(['Ngày chuyển', 'Tên đàn ong', 'Lộ trình di chuyển', 'Biển số xe', 'Trạng thái', 'Thao tác'], rows, 'Chưa có lịch di chuyển nào.'),
+          '<button class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" onclick="moveForm()" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-plus me-1"></i> Lên lịch di chuyển</button>'
+        ) + `
+          <div class="alert alert-info py-3 rounded-3 small d-flex align-items-center gap-3">
+            <i class="fas fa-circle-info fs-4 text-primary"></i>
+            <div>Khi đàn ong tới nơi, bấm nút <b>"Đã tới nơi an toàn"</b> để hệ thống tự động cập nhật vị trí mới và lưu tọa độ GPS của đàn ong.</div>
+          </div>
+        `;
+      },
+
+      production() {
+        const rows = (state.data.production || []).map((p) => `
+          <tr>
+            <td>${esc(p.ngay)}</td>
+            <td><b class="text-warning fs-6">${num(p.sanLuong)} ${esc(p.donVi)}</b></td>
+            <td><span class="badge text-bg-light border px-2 py-1">${esc(p.loaiMat)}</span></td>
+            <td>${esc(p.tenDanOng || '—')}</td>
+            <td>${esc(p.tenDiaDiem || '—')}</td>
+            <td>
+              ${p.maTruyXuat ? `<a target="_blank" class="fw-bold text-decoration-none text-primary" href="/truy-xuat-qr?ma=${p.maTruyXuat}"><i class="fas fa-qrcode me-1"></i>#${p.maTruyXuat}</a>` : '—'}
+            </td>
+          </tr>
+        `);
+
+        const qrs = (state.traces || []).slice(0, 8).map((t) => `
+          <div class="col-6 col-md-3">
+            <div class="card-modern text-center p-3 h-100 border">
+              <img class="img-fluid rounded mb-2 border p-1" style="width:140px;height:140px;" alt="QR Lô ${t.id}" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodeURIComponent(t.qrUrl)}">
+              <div class="fw-bold text-dark small">Lô #${t.id} · ${esc(t.sanPham)}</div>
+              <div class="small text-muted" style="font-size:0.75rem;">${num(t.sanLuongDuKien)} kg · ${esc(t.thoiGian)}</div>
+              <div class="mt-2 d-flex align-items-center justify-content-center gap-2">
+                <a class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3 fw-bold" style="font-size:0.75rem;" target="_blank" href="${esc(t.qrUrl)}">Trang xác thực <i class="fas fa-arrow-up-right-from-square ms-1"></i></a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        return section(
+          '<i class="fas fa-droplet text-warning me-2"></i> Lịch sử thu hoạch mật ong',
+          table(['Ngày thu', 'Sản lượng', 'Loại mật', 'Đàn ong', 'Địa điểm vườn', 'Mã lô QR'], rows, 'Chưa có sản lượng nào được ghi nhận.'),
+          `<span class="badge text-bg-warning p-2 me-2 rounded-pill">Tổng thu: <b>${num(state.data.summary?.totalProductionKg)} kg</b></span><button class="btn btn-warning fw-bold px-4 rounded-pill shadow-sm" onclick="productionForm()" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-plus me-1"></i> Ghi sản lượng mật</button>`
+        ) + section(
+          '<i class="fas fa-qrcode text-warning me-2"></i> Tem mã QR truy xuất nguồn gốc sản phẩm',
+          qrs ? `<div class="row g-3">${qrs}</div>` : '<div class="text-center text-muted py-5 small">Mỗi lần ghi sản lượng thu hoạch, hệ thống sẽ tự động tạo một mã QR chứng nhận nguồn gốc cho lô mật của bạn để dán lên chai lọ.</div>'
+        );
+      },
+
+      rent() {
+        const filteredAvail = state.available.filter((l) => {
+          const kw = state.filters.keyword.toLowerCase();
+          if (kw && !((l.tenDiaDiem || '').toLowerCase().includes(kw) || (l.diaChiChiTiet || '').toLowerCase().includes(kw) || (l.tenChuDat || '').toLowerCase().includes(kw))) return false;
+          if (state.filters.flower && !((l.loaiHoa || '').toLowerCase().includes(state.filters.flower.toLowerCase()))) return false;
+          if (state.filters.bee && !((l.loaiOngPhuHop || '').toLowerCase().includes(state.filters.bee.toLowerCase()))) return false;
+          if (state.filters.capacity === 'small' && (l.sucChuaToiDa || 0) >= 30) return false;
+          if (state.filters.capacity === 'medium' && ((l.sucChuaToiDa || 0) < 30 || (l.sucChuaToiDa || 0) > 80)) return false;
+          if (state.filters.capacity === 'large' && (l.sucChuaToiDa || 0) <= 80) return false;
+          if (state.filters.price === 'under800' && (l.giaThueThang || 0) > 800000) return false;
+          if (state.filters.price === '800to1500' && ((l.giaThueThang || 0) < 800000 || (l.giaThueThang || 0) > 1500000)) return false;
+          if (state.filters.price === 'over1500' && (l.giaThueThang || 0) <= 1500000) return false;
+          return true;
+        });
+
+        const availCards = filteredAvail.map((l) => {
+          const img = (l.hinhAnh && l.hinhAnh.trim()) ? l.hinhAnh : '/images/default-garden.svg';
+          return `
+            <div class="col-md-6 mb-3">
+              <div class="card-modern h-100 p-0 overflow-hidden d-flex flex-column border">
+                <div class="position-relative" style="height: 150px;">
+                  <img src="${img}" class="w-100 h-100 object-fit-cover" onclick="viewImage('${img}')" style="cursor:pointer;" title="Bấm xem ảnh lớn" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+                  ${l.giaThueThang ? `<div class="position-absolute bottom-0 start-0 m-2 badge bg-dark bg-opacity-75 text-white fw-bold px-2 py-1"><i class="fas fa-tag me-1"></i>${num(l.giaThueThang)} đ/tháng</div>` : ''}
+                </div>
+                <div class="p-3 flex-grow-1">
+                  <h5 class="fw-bold text-dark mb-1">${esc(l.tenDiaDiem)}</h5>
+                  <div class="small text-muted mb-2 text-truncate"><i class="fas fa-location-dot text-danger me-1"></i>${esc(l.diaChiChiTiet)}</div>
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div class="small">
+                      Chủ vườn: <b>${esc(l.tenChuDat)}</b>
+                      ${reputationBadge(l.laNguoiMoiChuDat, l.uyTinChuDat, l.tongDanhGiaChuDat)}
+                    </div>
+                  </div>
+                  <div class="small text-secondary mb-3">
+                    <div><i class="fas fa-box text-warning me-1"></i> Sức chứa: <b>${num(l.sucChuaToiDa)} thùng ong</b></div>
+                    <div><i class="fas fa-seedling text-success me-1"></i> Nguồn hoa: <b>${esc(l.loaiHoa || 'Tự nhiên')}</b></div>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between gap-2 border-top pt-2">
+                    ${l.maChuDat ? `<button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="setTab('chat'); setTimeout(()=>openChatWith(${l.maChuDat}, '${esc(l.tenChuDat)}', 'chuDat', '${esc(l.sdtChuDat || '')}'), 100)"><i class="fas fa-comment-dots me-1"></i> Nhắn tin</button>` : '<div></div>'}
+                    ${l.trangThaiYeuCauCuaToi ? chip(l.trangThaiYeuCauCuaToi) : `<button class="btn btn-sm btn-warning fw-bold rounded-pill px-3 shadow-sm" onclick="rentForm(${l.maDiaDiem})" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-paper-plane me-1"></i> Gửi yêu cầu thuê</button>`}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('') || '<div class="col-12 text-center text-muted py-5 small">Không tìm thấy địa điểm vườn nào phù hợp với bộ lọc.</div>';
+
+        const mineRows = state.requests.map((r) => `
+          <tr>
+            <td>
+              <div class="fw-bold text-dark fs-6">${esc(r.tenDiaDiem)}</div>
+              <div class="small text-muted d-flex align-items-center flex-wrap">
+                Chủ đất: ${esc(r.tenChuDat || '')}
+                ${reputationBadge(r.laNguoiMoiChuDat, r.uyTinChuDat, r.tongDanhGiaChuDat)}
+              </div>
+            </td>
+            <td class="small text-dark font-monospace">${esc(r.thoiGianBatDau)} → ${esc(r.thoiGianKetThuc || '')}</td>
+            <td><b class="text-warning fs-6">${num(r.soDanOng)}</b> đàn</td>
+            <td><b class="text-warning-emphasis fs-6">${money(r.giaThueDuKien)}</b></td>
+            <td>
+              ${chip(r.trangThai)}
+              ${r.lyDoTuChoi ? `<div class="small text-danger mt-1">Lý do: ${esc(r.lyDoTuChoi)}</div>` : ''}
+            </td>
+            <td class="text-end text-nowrap">
+              ${r.trangThai === 'ChoDuyet' ? `<button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="act('PUT','/beekeeping/rental-requests/${encodeURIComponent(r.maYeuCau)}/cancel',null,'Hủy yêu cầu thuê này?')">Hủy</button>` : ''}
+              ${r.trangThai === 'ChoKhachKy' ? `<button class="btn btn-sm btn-warning fw-bold rounded-pill px-3 shadow-sm" data-tab="contracts" style="background:var(--honey-gradient);border:none;color:#fff;"><i class="fas fa-pen-nib me-1"></i> Ký hợp đồng</button>` : ''}
+            </td>
+          </tr>
+        `);
+
+        return `
+          <!-- Thanh Bộ Lọc Nhanh 1-Chạm Dễ Tiếp Cận -->
+          <div class="card-modern mb-3 p-3">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                  <input class="form-control border-start-0" placeholder="Tìm theo tên vườn, địa chỉ..." value="${esc(state.filters.keyword)}" oninput="state.filters.keyword=this.value; render();">
+                </div>
+              </div>
+              <div class="col-md-2 col-6">
+                <select class="form-select" onchange="state.filters.flower=this.value; render();">
+                  <option value="">— Mùa hoa —</option>
+                  ${['Hoa Cà Phê', 'Hoa Vải Thiều', 'Hoa Nhãn', 'Hoa Bạc Hà', 'Hoa Tràm', 'Hoa Keo'].map(f => `<option value="${f}" ${state.filters.flower === f ? 'selected' : ''}>${f}</option>`).join('')}
+                </select>
+              </div>
+              <div class="col-md-2 col-6">
+                <select class="form-select" onchange="state.filters.bee=this.value; render();">
+                  <option value="">— Giống ong —</option>
+                  ${['Ong nội', 'Ong ngoại / Ong Ý', 'Ong dú'].map(b => `<option value="${b}" ${state.filters.bee === b ? 'selected' : ''}>${b}</option>`).join('')}
+                </select>
+              </div>
+              <div class="col-md-2 col-6">
+                <select class="form-select" onchange="state.filters.price=this.value; render();">
+                  <option value="">— Mức giá thuê —</option>
+                  <option value="under800" ${state.filters.price === 'under800' ? 'selected' : ''}>Dưới 800k/tháng</option>
+                  <option value="800to1500" ${state.filters.price === '800to1500' ? 'selected' : ''}>800k - 1.5tr/tháng</option>
+                  <option value="over1500" ${state.filters.price === 'over1500' ? 'selected' : ''}>Trên 1.5tr/tháng</option>
+                </select>
+              </div>
+              <div class="col-md-2 col-6 text-end">
+                <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="state.filters={keyword:'',flower:'',bee:'',capacity:'',price:''}; render();" title="Xóa bộ lọc"><i class="fas fa-rotate-left me-1"></i> Xóa lọc</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Split Bản đồ và Danh sách Vườn -->
+          <div class="row g-3 mb-4">
+            <div class="col-lg-5">
+              ${section('<i class="fas fa-map-marked-alt text-warning me-2"></i> Bản đồ vườn hoa trống', '<div id="rentMap" class="map-container"></div>')}
+            </div>
+            <div class="col-lg-7">
+              <div class="row g-2">${availCards}</div>
+            </div>
+          </div>
+
+          ${section('<i class="fas fa-clock-rotate-left text-warning me-2"></i> Yêu cầu thuê vườn của tôi', table(['Vườn đặt ong', 'Thời hạn thuê', 'Số đàn', 'Giá đề xuất', 'Trạng thái', 'Thao tác'], mineRows, 'Bạn chưa gửi yêu cầu thuê vườn nào.'))}
+        `;
+      },
+
+      contracts: contractsView,
+      chat: chatView,
+      notifications: notificationsView,
+      profile: profileView
+    };
+
+    function hiveForm(id) {
+      const h = id ? findHive(id) : {};
+      openForm(id ? 'Sửa thông tin đàn ong' : 'Thêm đàn ong mới', [
+        { name: 'tenDanOng', label: 'Tên đàn ong', required: true, value: h.tenDanOng, placeholder: 'VD: Đàn ong chúa Ý 01' },
+        { name: 'soThung', label: 'Số thùng ong', type: 'number', min: 1, required: true, value: h.soThung ?? 10 },
+        { name: 'maDiaDiem', label: 'Đặt tại đất vườn đã thuê', type: 'select', options: rentedOptions(), value: h.maDiaDiem ?? '' },
+        { name: 'viTri', label: 'Mô tả vị trí (nếu là vị trí riêng)', value: h.viTri, placeholder: 'Vườn nhà tại Xã...' },
+        { name: 'tinhTrang', label: 'Tình trạng sức khỏe đàn', value: h.tinhTrang ?? 'Khỏe mạnh', list: ['Khỏe mạnh', 'Cần bổ sung thức ăn', 'Đang chia đàn', 'Có dấu hiệu bệnh', 'Yếu'] },
+        { name: 'cayTruoc', label: 'Nguồn hoa chính', value: h.cayTruoc, list: ['Hoa nhãn', 'Hoa vải', 'Hoa cà phê', 'Hoa bạc hà', 'Hoa keo', 'Hoa tràm'] }
+      ], (v) => {
+        const body = { ...v, soThung: Number(v.soThung), maDiaDiem: v.maDiaDiem ? Number(v.maDiaDiem) : null };
+        return id ? api('PUT', `/beekeeping/hives/${encodeURIComponent(id)}`, body) : api('POST', '/beekeeping/hives', body);
+      });
+    }
+
+    function hiveGps(id) {
+      const h = findHive(id);
+      openForm('Cập nhật tọa độ GPS: ' + h.tenDanOng, [
+        { type: 'latlng', label: 'Tọa độ GPS', required: true, value: h.viDo ? { lat: h.viDo, lng: h.kinhDo } : null },
+        { name: 'viTri', label: 'Mô tả vị trí', value: h.viTri, col: 12 }
+      ], (v) => api('PUT', `/beekeeping/hives/${encodeURIComponent(id)}/location`, { viDo: Number(v.viDo), kinhDo: Number(v.kinhDo), viTri: v.viTri }));
+    }
+
+    function careForm() {
+      openForm('Thêm công việc chăm sóc đàn ong', [
+        { name: 'maDanOng', label: 'Áp dụng cho đàn ong', type: 'select', options: hiveOptions(true) },
+        { name: 'tenCongViec', label: 'Công việc cần làm', required: true, value: 'Kiểm tra sức khỏe đàn ong', list: ['Kiểm tra sức khỏe đàn ong', 'Bổ sung thức ăn (đường/phấn hoa)', 'Cho uống nước sạch', 'Phòng trị bệnh ấu trùng', 'Thay ong chúa', 'Vệ sinh khử trùng thùng'] },
+        { name: 'ngay', label: 'Ngày thực hiện', type: 'date', required: true, value: today() },
+        { name: 'gio', label: 'Giờ', type: 'time', value: '07:30' },
+        { name: 'trangThai', label: 'Trạng thái ban đầu', type: 'select', options: [{ value: 'Lên lịch', label: 'Lên lịch' }, { value: 'Đã hoàn thành', label: 'Đã hoàn thành xong' }] },
+        { name: 'ghiChu', label: 'Ghi chú thêm', type: 'textarea', col: 12 }
+      ], (v) => api('POST', '/beekeeping/care-log', { ...v, maDanOng: v.maDanOng || null }));
+    }
+
+    function moveForm() {
+      if (!hives().length) return toast('Bạn cần tạo đàn ong trước.', true);
+      const rented = state.data.rentedLocations || [];
+      openForm('Lên lịch di chuyển đàn ong', [
+        { name: 'maDanOng', label: 'Chọn đàn ong di chuyển', type: 'select', options: hiveOptions(false), required: true },
+        { name: 'maDiaDiemDen', label: 'Điểm đến là đất đã thuê', type: 'select', options: [{ value: '', label: rented.length ? '— Hoặc nhập điểm đến khác bên dưới —' : '— Chưa có đất thuê —' }, ...rented.map((l) => ({ value: l.maDiaDiem, label: l.tenDiaDiem }))] },
+        { name: 'viTriDen', label: 'Hoặc nhập điểm đến khác' },
+        { name: 'ngay', label: 'Ngày di chuyển', type: 'date', required: true, value: today() },
+        { name: 'bienSo', label: 'Biển số xe vận chuyển', placeholder: 'VD: 29C-12345' },
+        { name: 'ghiChu', label: 'Ghi chú lộ trình', col: 12 }
+      ], (v) => {
+        if (!v.maDiaDiemDen && !v.viTriDen.trim()) throw new Error('Vui lòng chọn đất thuê hoặc nhập điểm đến.');
+        return api('POST', '/beekeeping/move', { ...v, maDiaDiemDen: v.maDiaDiemDen ? Number(v.maDiaDiemDen) : null });
+      });
+    }
+
+    function productionForm() {
+      if (!hives().length) return toast('Bạn cần tạo đàn ong trước.', true);
+      openForm('Ghi sản lượng thu hoạch mật', [
+        { name: 'maDanOng', label: 'Thu hoạch từ đàn ong', type: 'select', options: hiveOptions(false), required: true },
+        { name: 'sanLuong', label: 'Sản lượng', type: 'number', step: '0.1', min: 0.1, required: true, placeholder: 'VD: 15.5' },
+        { name: 'donVi', label: 'Đơn vị đo', type: 'select', options: [{ value: 'kg', label: 'kg (Kilogram)' }, { value: 'lít', label: 'lít' }] },
+        { name: 'loaiMat', label: 'Loại mật hoa', required: true, value: 'Mật hoa nhãn', list: ['Mật hoa nhãn', 'Mật hoa vải', 'Mật hoa cà phê', 'Mật bạc hà', 'Mật hoa keo', 'Mật rừng tự nhiên'] },
+        { name: 'loaiOng', label: 'Giống ong', value: 'Ong nội (Apis cerana)', list: ['Ong nội (Apis cerana)', 'Ong ngoại / Ong Ý (Apis mellifera)', 'Ong dú (Stingless bee)'] },
+        { name: 'ngay', label: 'Ngày thu hoạch', type: 'date', required: true, value: today() },
+        { name: 'ghiChu', label: 'Ghi chú chất lượng', col: 12 }
+      ], (v) => api('POST', '/beekeeping/production', { ...v, sanLuong: Number(v.sanLuong) }));
+    }
+
+    function rentForm(maDiaDiem) {
+      const l = state.available.find((x) => x.maDiaDiem === maDiaDiem);
+      const end = new Date(Date.now() + 180 * 864e5).toISOString().slice(0, 10);
+      openForm('Gửi yêu cầu thuê: ' + l.tenDiaDiem, [
+        { name: 'thoiGianBatDau', label: 'Ngày bắt đầu thuê', type: 'date', required: true, value: today() },
+        { name: 'thoiGianKetThuc', label: 'Ngày kết thúc thuê', type: 'date', required: true, value: end },
+        { name: 'soDanOng', label: `Số đàn ong muốn đặt (Tối đa ${l.sucChuaToiDa} đàn)`, type: 'number', min: 1, required: true, value: 10 },
+        { name: 'giaThueDuKien', label: 'Giá đề xuất (đồng/tháng)', type: 'number', min: 0, value: l.giaThueThang ?? '' },
+        { name: 'ghiChu', label: 'Lời nhắn gửi chủ đất', type: 'textarea', col: 12, placeholder: 'Giới thiệu về kinh nghiệm nuôi ong, cam kết giữ gìn cây trồng...' }
+      ], (v) => api('POST', '/beekeeping/rental-requests', { ...v, maDiaDiem, soDanOng: Number(v.soDanOng), giaThueDuKien: v.giaThueDuKien ? Number(v.giaThueDuKien) : null }), 'Gửi yêu cầu cho chủ đất');
+    }
+
+    // ================= XỬ LÝ SAU KHI RENDER TỪNG VIEW =================
+    const hivePopup = (h) => `<b>${esc(h.tenDanOng)}</b><br><span class="text-warning fw-bold">${num(h.soThung)} thùng</span> · ${esc(h.tinhTrang || '')}<br><span class="text-muted small">${esc(h.tenDiaDiem || h.viTri || '')}</span>`;
+
+    const AFTER_RENDER = IS_LANDOWNER ? {
+      overview() {
+        drawMap('overviewMap', [
+          ...(state.data.locations || []).map((l) => ({ lat: l.viDo, lng: l.kinhDo, color: '#10b981', radius: 10, popup: `<b>${esc(l.tenDiaDiem)}</b><br>${num(l.soThung)}/${num(l.sucChuaToiDa)} thùng<br><span class="text-muted small">${esc(l.diaChiChiTiet)}</span>` })),
+          ...(state.data.hives || []).map((h) => ({ lat: h.viDo, lng: h.kinhDo, color: '#f43f5e', radius: 8, popup: hivePopup(h) + `<br>Chủ: <b>${esc(h.tenNguoiNuoiOng)}</b>` }))
+        ]);
+      },
+      hives() {
+        drawMap('hiveMap', (state.data.hives || []).map((h) => ({ lat: h.viDo, lng: h.kinhDo, color: '#f43f5e', popup: hivePopup(h) + `<br>Chủ: <b>${esc(h.tenNguoiNuoiOng)}</b>` })));
+      },
+      chat() {
+        loadChatConversations();
+      }
+    } : {
+      overview() {
+        drawMap('overviewMap', hives().map((h) => ({ lat: h.viDo, lng: h.kinhDo, color: '#f59e0b', popup: hivePopup(h) })));
+      },
+      hives() {
+        drawMap('hiveMap', hives().map((h) => ({ lat: h.viDo, lng: h.kinhDo, color: '#f59e0b', popup: hivePopup(h) })));
+      },
+      rent() {
+        drawMap('rentMap', state.available.map((l) => ({
+          lat: l.viDo, lng: l.kinhDo, color: '#10b981', radius: 10,
+          popup: `<b>${esc(l.tenDiaDiem)}</b><br>Chủ: <b>${esc(l.tenChuDat)}</b> · ${num(l.sucChuaToiDa)} thùng<br>` +
+            (l.trangThaiYeuCauCuaToi ? '<span class="badge text-bg-warning">Đã gửi yêu cầu</span>' : `<button class="btn btn-warning btn-sm py-0 mt-1" onclick="rentForm(${l.maDiaDiem})">Thuê ngay</button>`)
+        })));
+      },
+      chat() {
+        loadChatConversations();
+      }
+    };
+
+    // ================= ĐỒNG BỘ ĐỊNH KỲ =================
+    setInterval(() => {
+      if (!document.hidden && !document.querySelector('.modal.show')) {
+        load();
+      }
+      if (!document.hidden && state.tab === 'chat' && state.chat.activePartnerId) {
+        fetchChatHistory();
+      }
+    }, 15000);
+
+    // Tải dữ liệu lần đầu
+    load();
+  </script>
+</body>
+
+</html>

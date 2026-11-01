@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tra cứu nguồn gốc mật ong</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#fbf7ec;color:#1f1a17}
+  main{max-width:720px;margin:0 auto;padding:20px 16px 40px}
+  header{background:linear-gradient(135deg,#ffd76a,#ffb800);border-radius:20px;padding:22px;margin-bottom:16px}
+  header h1{margin:0 0 6px;font-size:1.45rem}header p{margin:0;opacity:.8}
+  .card{background:#fff;border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 4px 16px #0000000d}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  input{flex:1;min-width:180px;padding:12px 14px;border:1px solid #ddd;border-radius:12px;font-size:1rem}
+  button{padding:12px 16px;border:0;border-radius:12px;font-weight:600;cursor:pointer;font-size:.95rem}
+  .primary{background:#ffb800;color:#1f1a17}.outline{background:#fff;border:1px solid #1e7b5f;color:#1e7b5f}
+  #reader{margin-top:12px;border-radius:14px;overflow:hidden}
+  .item{display:block;padding:12px;border-radius:12px;text-decoration:none;color:inherit;border:1px solid #f1ece0;margin-top:8px}
+  .item:hover{background:#fff8e1}.item b{display:block}.muted{color:#6b6257;font-size:.88rem}
+  .error{color:#c62828;margin-top:8px}
+  a.back{color:#6b6257;font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1><i class="fas fa-qrcode"></i> Tra cứu nguồn gốc mật ong</h1>
+    <p>Nhập mã lô in trên nhãn, tìm theo tên sản phẩm / nơi khai thác, hoặc quét mã QR.</p>
+  </header>
+
+  <section class="card">
+    <form id="form" class="row">
+      <input id="q" placeholder="Mã lô (vd: 12) hoặc tên mật, vườn, người nuôi ong" autocomplete="off">
+      <button class="primary" type="submit"><i class="fas fa-search"></i> Tra cứu</button>
+      <button class="outline" type="button" id="scan"><i class="fas fa-camera"></i> Quét QR</button>
+    </form>
+    <div id="reader"></div>
+    <div id="error" class="error"></div>
+  </section>
+
+  <section class="card">
+    <h2 style="font-size:1.05rem;margin:0" id="title">Sản phẩm mới nhất</h2>
+    <div id="results"><p class="muted">Đang tải...</p></div>
+  </section>
+
+  <a class="back" href="/login"><i class="fas fa-arrow-left"></i> Đăng nhập dành cho người nuôi ong / chủ đất</a>
+</main>
+<script>
+  const results = document.getElementById('results');
+  const errorBox = document.getElementById('error');
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const open = (id) => { location.href = '/truy-xuat-qr?ma=' + encodeURIComponent(id); };
+
+  async function search(q) {
+    errorBox.textContent = '';
+    document.getElementById('title').textContent = q ? 'Kết quả cho "' + q + '"' : 'Sản phẩm mới nhất';
+    results.innerHTML = '<p class="muted">Đang tải...</p>';
+    try {
+      const res = await fetch('/api/public/san-pham?q=' + encodeURIComponent(q || ''));
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      if (json.data.length === 1 && /^#?\d+$/.test(q || '')) return open(json.data[0].maLo);
+      results.innerHTML = json.data.length
+        ? json.data.map((x) => `<a class="item" href="/truy-xuat-qr?ma=${x.maLo}"><b>#${x.maLo} · ${esc(x.sanPham)}</b>
+            <span class="muted">${Number(x.kg || 0).toLocaleString('vi-VN')} kg · ${esc(x.tenDiaDiem)} · ${esc(x.nguoiNuoiOng)} · ${esc(x.ngay)}</span></a>`).join('')
+        : '<p class="muted">Không tìm thấy sản phẩm phù hợp.</p>';
+    } catch (e) {
+      results.innerHTML = '';
+      errorBox.textContent = 'Không tra cứu được: ' + e.message;
+    }
+  }
+
+  document.getElementById('form').addEventListener('submit', (e) => { e.preventDefault(); search(document.getElementById('q').value.trim()); });
+
+  // Quét QR bằng camera: mã QR chứa đường dẫn /truy-xuat-qr?ma=<số> hoặc chỉ mã số.
+  let scanner = null;
+  document.getElementById('scan').addEventListener('click', async () => {
+    errorBox.textContent = '';
+    if (scanner) { await scanner.stop().catch(() => {}); scanner.clear(); scanner = null; return; }
+    if (typeof Html5Qrcode === 'undefined') { errorBox.textContent = 'Không tải được thư viện quét QR (cần Internet).'; return; }
+    scanner = new Html5Qrcode('reader');
+    try {
+      await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: 230 }, (text) => {
+        const match = String(text).match(/[?&](?:ma|id)=(\d+)/) || String(text).match(/^#?(\d+)$/);
+        if (match) { scanner.stop().finally(() => open(match[1])); }
+        else errorBox.textContent = 'Mã QR không thuộc hệ thống truy xuất ong mật.';
+      });
+    } catch (e) {
+      scanner = null;
+      errorBox.textContent = 'Không mở được camera: ' + (e.message || e) + '. Trên máy tính có thể nhập mã lô thay thế.';
+    }
+  });
+
+  search('');
+</script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <!-- Sky & Sunlight Gradient -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="50%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+
+    <!-- Warm Golden Sun Glow -->
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#fde047" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#fde047" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Rolling Hills Gradients -->
+    <linearGradient id="hillBackGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#86efac"/>
+      <stop offset="100%" stop-color="#4ade80"/>
+    </linearGradient>
+
+    <linearGradient id="hillFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Beehive Wood Gradient -->
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="25%" stop-color="#f59e0b"/>
+      <stop offset="75%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#92400e"/>
+      <stop offset="100%" stop-color="#78350f"/>
+    </linearGradient>
+
+    <!-- Honeycomb Pattern in Sky -->
+    <pattern id="honeyPattern" width="40" height="70" patternUnits="userSpaceOnUse" patternTransform="scale(0.8)">
+      <path d="M 20,0 L 40,11.5 L 40,34.5 L 20,46 L 0,34.5 L 0,11.5 Z M 20,70 L 40,58.5 L 40,35.5 L 20,24 L 0,35.5 L 0,58.5 Z" fill="none" stroke="#f59e0b" stroke-width="1.2" opacity="0.12"/>
+    </pattern>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="800" height="500" fill="url(#skyGrad)"/>
+
+  <!-- Honeycomb Overlay in Sky -->
+  <rect width="800" height="260" fill="url(#honeyPattern)"/>
+
+  <!-- Golden Sun -->
+  <circle cx="680" cy="90" r="110" fill="url(#sunGlow)"/>
+  <circle cx="680" cy="90" r="45" fill="#fde047" stroke="#fef08a" stroke-width="4"/>
+
+  <!-- Distant Mountain/Hills -->
+  <path d="M-50 300 Q 150 190 380 270 T 850 250 L 850 500 L -50 500 Z" fill="#bbf7d0" opacity="0.6"/>
+  <path d="M-50 340 Q 220 230 480 310 T 850 290 L 850 500 L -50 500 Z" fill="url(#hillBackGrad)"/>
+  <path d="M-50 380 Q 280 280 550 360 T 850 340 L 850 500 L -50 500 Z" fill="url(#hillFrontGrad)"/>
+
+  <!-- Fruit Trees in Distance -->
+  <!-- Tree 1 -->
+  <circle cx="160" cy="270" r="38" fill="#15803d"/>
+  <circle cx="140" cy="260" r="28" fill="#16a34a"/>
+  <circle cx="180" cy="255" r="30" fill="#22c55e"/>
+  <!-- Blossoms on Tree 1 -->
+  <circle cx="135" cy="250" r="4" fill="#fef08a"/>
+  <circle cx="155" cy="245" r="4" fill="#fef08a"/>
+  <circle cx="175" cy="260" r="4" fill="#fef08a"/>
+  <circle cx="150" cy="275" r="4" fill="#fef08a"/>
+
+  <!-- Tree 2 -->
+  <circle cx="650" cy="290" r="46" fill="#15803d"/>
+  <circle cx="625" cy="280" r="34" fill="#16a34a"/>
+  <circle cx="675" cy="275" r="36" fill="#22c55e"/>
+  <!-- Blossoms on Tree 2 -->
+  <circle cx="630" cy="270" r="4.5" fill="#fbcfe8"/>
+  <circle cx="660" cy="265" r="4.5" fill="#fbcfe8"/>
+  <circle cx="680" cy="285" r="4.5" fill="#fbcfe8"/>
+
+  <!-- Foreground Wooden Beehive (Thùng Nuôi Ong Gỗ Mộc Mạc) -->
+  <g transform="translate(340, 260)">
+    <!-- Shadow -->
+    <ellipse cx="60" cy="170" rx="95" ry="18" fill="#064e3b" opacity="0.35"/>
+
+    <!-- Stand / Chân kê -->
+    <rect x="15" y="145" width="14" height="25" fill="#78350f" rx="3"/>
+    <rect x="91" y="145" width="14" height="25" fill="#78350f" rx="3"/>
+    <rect x="5" y="140" width="110" height="10" fill="#92400e" rx="2"/>
+
+    <!-- Bottom Super (Tầng đáy) -->
+    <rect x="10" y="95" width="100" height="45" fill="url(#woodGrad)" rx="4" stroke="#b45309" stroke-width="2"/>
+    <!-- Entrance Slot (Cửa ong ra vào) -->
+    <rect x="35" y="130" width="50" height="7" fill="#1e1b18" rx="3"/>
+    <!-- Landing Board (Cầu đậu cho ong) -->
+    <polygon points="30,137 90,137 95,143 25,143" fill="#b45309"/>
+    <!-- Wood Planks detail -->
+    <line x1="12" y1="117" x2="108" y2="117" stroke="#b45309" stroke-width="1.5" stroke-dasharray="80 3"/>
+
+    <!-- Top Super (Tầng kế / Tầng mật) -->
+    <rect x="10" y="45" width="100" height="48" fill="url(#woodGrad)" rx="4" stroke="#b45309" stroke-width="2"/>
+    <line x1="12" y1="68" x2="108" y2="68" stroke="#b45309" stroke-width="1.5" stroke-dasharray="80 3"/>
+    <!-- Handle -->
+    <rect x="42" y="60" width="36" height="8" fill="#92400e" rx="3"/>
+
+    <!-- Roof (Mái che thùng ong) -->
+    <polygon points="-2,45 122,45 110,24 10,24" fill="url(#roofGrad)" stroke="#78350f" stroke-width="2"/>
+    <rect x="18" y="16" width="84" height="10" fill="#a16207" rx="3"/>
+  </g>
+
+  <!-- Smaller Second Beehive on the Left -->
+  <g transform="translate(190, 310) scale(0.68)">
+    <ellipse cx="60" cy="170" rx="90" ry="16" fill="#064e3b" opacity="0.3"/>
+    <rect x="15" y="145" width="14" height="25" fill="#78350f" rx="3"/>
+    <rect x="91" y="145" width="14" height="25" fill="#78350f" rx="3"/>
+    <rect x="5" y="140" width="110" height="10" fill="#92400e" rx="2"/>
+    <rect x="10" y="95" width="100" height="45" fill="url(#woodGrad)" rx="4" stroke="#b45309" stroke-width="2"/>
+    <rect x="35" y="130" width="50" height="7" fill="#1e1b18" rx="3"/>
+    <rect x="10" y="45" width="100" height="48" fill="url(#woodGrad)" rx="4" stroke="#b45309" stroke-width="2"/>
+    <polygon points="-2,45 122,45 110,24 10,24" fill="url(#roofGrad)" stroke="#78350f" stroke-width="2"/>
+  </g>
+
+  <!-- Blooming Wild Flowers in Foreground -->
+  <!-- Sunflower 1 -->
+  <g transform="translate(110, 390)">
+    <path d="M 15 60 Q 20 20 15 0" stroke="#16a34a" stroke-width="5" fill="none"/>
+    <circle cx="15" cy="0" r="16" fill="#f59e0b"/>
+    <circle cx="15" cy="0" r="10" fill="#78350f"/>
+    <!-- Petals -->
+    <circle cx="15" cy="-18" r="6" fill="#fbbf24"/>
+    <circle cx="15" cy="18" r="6" fill="#fbbf24"/>
+    <circle cx="-3" cy="0" r="6" fill="#fbbf24"/>
+    <circle cx="33" cy="0" r="6" fill="#fbbf24"/>
+    <circle cx="3" cy="-12" r="6" fill="#fde047"/>
+    <circle cx="27" cy="-12" r="6" fill="#fde047"/>
+    <circle cx="3" cy="12" r="6" fill="#fde047"/>
+    <circle cx="27" cy="12" r="6" fill="#fde047"/>
+  </g>
+
+  <!-- Sunflower 2 -->
+  <g transform="translate(680, 400)">
+    <path d="M 15 50 Q 10 20 15 0" stroke="#16a34a" stroke-width="5" fill="none"/>
+    <circle cx="15" cy="0" r="14" fill="#f59e0b"/>
+    <circle cx="15" cy="0" r="8" fill="#78350f"/>
+    <circle cx="15" cy="-15" r="5" fill="#fbbf24"/>
+    <circle cx="15" cy="15" r="5" fill="#fbbf24"/>
+    <circle cx="0" cy="0" r="5" fill="#fbbf24"/>
+    <circle cx="30" cy="0" r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- Flying Honeybees with Flight Path (Đàn Ong Bay Kiếm Mật) -->
+  <!-- Flight Path Dashed Line -->
+  <path d="M 280 220 Q 320 180 390 210 T 480 190" fill="none" stroke="#d97706" stroke-width="1.8" stroke-dasharray="5 5" opacity="0.65"/>
+
+  <!-- Bee 1 (Large) -->
+  <g transform="translate(480, 185) scale(0.9) rotate(-15)">
+    <!-- Wings -->
+    <ellipse cx="-4" cy="-12" rx="7" ry="12" fill="#ffffff" opacity="0.85" stroke="#bae6fd" stroke-width="1"/>
+    <ellipse cx="6" cy="-14" rx="6" ry="11" fill="#ffffff" opacity="0.75" stroke="#bae6fd" stroke-width="1"/>
+    <!-- Body -->
+    <ellipse cx="0" cy="0" rx="14" ry="9" fill="#f59e0b"/>
+    <!-- Stripes -->
+    <path d="M-6 -8 L-6 8" stroke="#0f172a" stroke-width="3"/>
+    <path d="M-1 -9 L-1 9" stroke="#0f172a" stroke-width="3"/>
+    <path d="M4 -8 L4 8" stroke="#0f172a" stroke-width="3"/>
+    <!-- Stinger -->
+    <polygon points="-14,0 -18,-1 -18,1" fill="#0f172a"/>
+    <!-- Head -->
+    <circle cx="14" cy="0" r="6" fill="#0f172a"/>
+    <circle cx="16" cy="-2" r="1.5" fill="#ffffff"/>
+    <!-- Antennae -->
+    <path d="M16 -4 Q20 -8 22 -6" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+  </g>
+
+  <!-- Bee 2 (Medium) -->
+  <g transform="translate(290, 215) scale(0.65) rotate(12)">
+    <ellipse cx="-4" cy="-12" rx="7" ry="12" fill="#ffffff" opacity="0.85" stroke="#bae6fd" stroke-width="1"/>
+    <ellipse cx="6" cy="-14" rx="6" ry="11" fill="#ffffff" opacity="0.75" stroke="#bae6fd" stroke-width="1"/>
+    <ellipse cx="0" cy="0" rx="14" ry="9" fill="#f59e0b"/>
+    <path d="M-6 -8 L-6 8" stroke="#0f172a" stroke-width="3"/>
+    <path d="M-1 -9 L-1 9" stroke="#0f172a" stroke-width="3"/>
+    <path d="M4 -8 L4 8" stroke="#0f172a" stroke-width="3"/>
+    <circle cx="14" cy="0" r="6" fill="#0f172a"/>
+  </g>
+
+  <!-- Bee 3 (Small near flower) -->
+  <g transform="translate(145, 360) scale(0.5) rotate(-25)">
+    <ellipse cx="0" cy="-10" rx="6" ry="10" fill="#ffffff" opacity="0.85"/>
+    <ellipse cx="0" cy="0" rx="12" ry="8" fill="#f59e0b"/>
+    <path d="M-4 -7 L-4 7" stroke="#0f172a" stroke-width="2.5"/>
+    <path d="M2 -7 L2 7" stroke="#0f172a" stroke-width="2.5"/>
+    <circle cx="12" cy="0" r="5" fill="#0f172a"/>
+  </g>
+
+  <!-- Honey Jar Watermark Badge Bottom-Right (Biểu tượng Mật Ong Thiên Nhiên) -->
+  <g transform="translate(710, 430) scale(0.75)">
+    <rect x="-10" y="-10" width="90" height="70" rx="16" fill="#ffffff" opacity="0.88" stroke="#fde68a" stroke-width="2"/>
+    <text x="35" y="45" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="11" font-weight="700" fill="#92400e" text-anchor="middle">VƯỜN ONG</text>
+    <!-- Honey Drop -->
+    <path d="M35 12 C35 12 25 24 25 29 A10 10 0 0 0 45 29 C45 24 35 12 35 12 Z" fill="#f59e0b"/>
+    <circle cx="32" cy="27" r="2" fill="#fef08a"/>
+  </g>
+</svg>
+

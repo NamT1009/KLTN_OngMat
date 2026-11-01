@@ -1,0 +1,23 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (Bảo mật tài khoản & mật khẩu)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+error.log
+output.log
+
+# Uploads thư mục tạm thời
+uploads/temp/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.idea/

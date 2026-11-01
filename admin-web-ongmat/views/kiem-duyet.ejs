@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kiểm Duyệt Địa Điểm | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #212529;
+            text-align: center;
+            color: #ffc107;
+            border-bottom: 1px solid #4b545c;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 20px;
+            color: #c2c7d0;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: #495057;
+            color: #fff;
+            border-left-color: #ffc107;
+        }
+
+        .sidebar-menu li a i {
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+            .eco-chip {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            user-select: none;
+        }
+        .eco-chip:hover {
+            background-color: #e2e8f0 !important;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Nhúng Sidebar dùng chung -->
+    <%- include('./partials/sidebar') %>
+
+        <div class="main-content">
+            <%- include('./partials/topbar') %>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="text-secondary fw-bold">Kiểm Duyệt Địa Điểm Vườn</h3>
+                    <p class="text-muted mb-0">Xét duyệt các đăng ký điểm đặt ong mới từ Chủ đất dựa trên thông tin pháp
+                        lý và tọa độ.</p>
+                </div>
+                <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#modalThemDiaDiem">
+                    <i class="fas fa-plus-circle me-1"></i> Thêm Địa Điểm
+                </button>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark text-nowrap">
+                            <tr>
+                                <th class="ps-4 py-3">MÃ</th>
+                                <th class="py-3">HÌNH ẢNH</th>
+                                <th class="py-3">TÊN ĐỊA ĐIỂM / CHỦ ĐẤT</th>
+                                <th class="py-3">DIỆN TÍCH & SỨC CHỨA</th>
+                                <th class="py-3">THÔNG TIN PHÁP LÝ</th>
+                                <th class="py-3 text-center">BẢN ĐỒ</th>
+                                <th class="py-3 text-center">TRẠNG THÁI</th>
+                                <th class="text-center py-3" style="min-width: 150px;">THAO TÁC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <% if (typeof danhSachDiaDiem !=='undefined' && danhSachDiaDiem.length> 0) { %>
+                                <% danhSachDiaDiem.forEach(function(item) { %>
+                                    <tr>
+                                        <!-- 1. Cột MÃ -->
+                                        <td class="ps-4 text-muted fw-medium">#<%= item.maDiaDiem %>
+                                        </td>
+
+                                        <!-- 2. Cột HÌNH ẢNH -->
+                                        <td>
+                                            <% if (item.hinhAnh && item.hinhAnh.trim() !=='' ) { %>
+                                                <a href="<%= item.hinhAnh %>" target="_blank" title="Xem ảnh lớn">
+                                                    <img src="<%= item.hinhAnh %>" alt="Ảnh" onerror="this.onerror=null; this.src='/images/default-garden.svg';"
+                                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6;">
+                                                </a>
+                                                <% } else { %>
+                                                    <span class="text-muted"
+                                                        style="display:none;"></span><img src="/images/default-garden.svg" alt="Ảnh vườn" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px; border: 1px solid #dee2e6;" title="Chưa có ảnh (Ảnh minh họa)">
+                                                    <% } %>
+                                        </td>
+
+                                        <!-- 3. Cột TÊN ĐỊA ĐIỂM / CHỦ ĐẤT -->
+                                        <td>
+                                            <div class="fw-bold text-primary mb-1">
+                                                <%= item.tenDiaDiem %>
+                                            </div>
+                                            <div class="small text-muted">
+                                                <i class="fas fa-user text-secondary me-1"></i>
+                                                <%= item.tenChuDat || 'Chưa cập nhật' %>
+                                            </div>
+                                        </td>
+
+                                        <!-- 4. Cột DIỆN TÍCH & SỨC CHỨA -->
+                                        <td>
+                                            <div class="text-dark mb-1">
+                                                <%= item.dienTich %> m&sup2;
+                                            </div>
+                                            <div class="small text-muted">
+                                                <i class="fas fa-archive text-secondary me-1"></i>Max: <%=
+                                                    item.sucChuaToiDa || 0 %> đàn
+                                            </div>
+                                        </td>
+
+                                        <!-- 5. Cột THÔNG TIN PHÁP LÝ -->
+                                        <td>
+                                            <div class="text-wrap" style="max-width: 250px;">
+                                                <span class="text-muted small">
+                                                    <%= item.thongTinPhapLy || 'Không có thông tin' %>
+                                                </span>
+                                            </div>
+                                        </td>
+
+                                        <!-- 6. Cột BẢN ĐỒ -->
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-info rounded-pill px-3"
+                                                onclick="xemBanDo(<%= item.viDo %>, <%= item.kinhDo %>, '<%= item.tenDiaDiem %>')">
+                                                <i class="fas fa-map-marked-alt me-1"></i>Xem
+                                            </button>
+                                        </td>
+
+                                        <!-- 7. Cột TRẠNG THÁI -->
+                                        <td class="text-center">
+                                            <% if (item.trangThaiKiemDuyet==='ChoDiemDuyet' ) { %>
+                                                <span
+                                                    class="badge rounded-pill bg-warning text-dark px-3 py-2 border border-warning"><i
+                                                        class="fas fa-clock me-1"></i>Chờ Duyệt</span>
+                                                <% } else if (item.trangThaiKiemDuyet==='DaDuyet' ) { %>
+                                                    <span
+                                                        class="badge rounded-pill bg-success px-3 py-2 border border-success"><i
+                                                            class="fas fa-check-circle me-1"></i>Đã Duyệt</span>
+                                                    <% } else { %>
+                                                        <span
+                                                            class="badge rounded-pill bg-danger px-3 py-2 border border-danger"><i
+                                                                class="fas fa-times-circle me-1"></i>Từ Chối</span>
+                                                        <% } %>
+                                        </td>
+
+                                        <!-- 8. Cột THAO TÁC -->
+                                        <td class="text-center">
+                                            <% if (item.trangThaiKiemDuyet==='ChoDiemDuyet' ) { %>
+                                                <button class="btn btn-sm btn-success rounded-3 me-1"
+                                                    onclick="xulyDiaDiem(<%= item.maDiaDiem %>, 'duyet')"
+                                                    title="Duyệt"><i class="fas fa-check"></i></button>
+                                                <button class="btn btn-sm btn-warning rounded-3 me-1"
+                                                    onclick="xulyDiaDiem(<%= item.maDiaDiem %>, 'tuchoi')"
+                                                    title="Từ chối"><i class="fas fa-ban text-dark"></i></button>
+                                                <% } else { %>
+                                                    <span class="badge bg-secondary">Đã xử lý</span>
+                                                    <% } %>
+                                                        <button class="btn btn-sm btn-danger rounded-3 ms-1"
+                                                            onclick="xoaDiaDiem(<%= item.maDiaDiem %>)" title="Xóa"><i
+                                                                class="fas fa-trash-alt"></i></button>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="8" class="text-center py-5 text-muted">
+                                                    <i class="fas fa-inbox fa-3x mb-3 text-light"></i>
+                                                    <h5>Không có đăng ký điểm đặt ong nào.</h5>
+                                                </td>
+                                            </tr>
+                                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Thêm Địa Điểm Mới -->
+        <div class="modal fade" id="modalThemDiaDiem" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white py-3">
+                        <h5 class="modal-title fw-bold">
+                            <i class="fas fa-map-marked-alt me-2"></i>Thêm Địa Điểm & Nhận Diện Sinh Thái
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <form id="formThemDiaDiem">
+                            <!-- Nhóm 1: Chủ đất & Tên địa điểm -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-dark">Chủ Đất <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="maChuDat" required>
+                                        <option value="">-- Chọn chủ đất --</option>
+                                        <% if (typeof danhSachChuDat !== 'undefined') { %>
+                                            <% danhSachChuDat.forEach(chu => { %>
+                                                <option value="<%= chu.maNguoiDung %>">
+                                                    <%= chu.hoTen %> - <%= chu.soDienThoai %>
+                                                </option>
+                                            <% }) %>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-dark">Tên Địa Điểm <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="tenDiaDiem"
+                                        placeholder="VD: Vườn Vải Lục Ngạn, Đồi Mận Mộc Châu..." required>
+                                </div>
+                            </div>
+
+                            <!-- Nhóm 2: Diện tích, Sức chứa, Giá thuê -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-dark">Diện Tích (m²) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="dienTich" placeholder="VD: 50000" min="1" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-dark">Sức Chứa Tối Đa (Đàn) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="sucChuaToiDa" placeholder="VD: 150" min="1" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-dark">Giá Thuê Đề Xuất (VNĐ/tháng)</label>
+                                    <input type="number" class="form-control" id="giaThueThang" placeholder="VD: 1000000" min="0">
+                                </div>
+                            </div>
+
+                            <!-- Nhóm 3: Tìm Kiếm Địa Điểm & Tọa Độ GPS -->
+                            <div class="card border-0 bg-light p-3 rounded-3 mb-3">
+                                <label class="form-label fw-bold small text-dark d-flex justify-content-between align-items-center mb-2">
+                                    <span><i class="fas fa-search-location text-primary me-1"></i> Địa Chỉ & Tìm Kiếm Vị Trí <span class="text-danger">*</span></span>
+                                    <span class="text-muted fw-normal" style="font-size:0.75rem;">Nhập tên xã/huyện/tỉnh rồi bấm Tìm Vị Trí</span>
+                                </label>
+                                <div class="position-relative mb-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="diaChiChiTiet" placeholder="Nhập địa chỉ, xã, huyện, tỉnh... (gõ để xem gợi ý tự động)" autocomplete="off" required>
+                                        <button class="btn btn-primary fw-bold px-3" type="button" id="btnTimDiaDiem" onclick="timKiemDiaDiemAdmin()">
+                                            <i class="fas fa-search me-1"></i> Tìm Vị Trí
+                                        </button>
+                                    </div>
+                                    <!-- Hộp gợi ý địa điểm tự động khi nhập -->
+                                    <div id="diaChiSuggestionsDropdown" class="list-group shadow-lg position-absolute w-100 mt-1 d-none" style="z-index: 1060; max-height: 260px; overflow-y: auto; border-radius: 8px;"></div>
+                                </div>
+
+                                <div class="row g-2 mb-2 align-items-end">
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">Vĩ Độ (Latitude) <span class="text-danger">*</span></label>
+                                        <input type="number" step="any" class="form-control form-control-sm" id="viDo" placeholder="VD: 20.8465" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small text-muted mb-1">Kinh Độ (Longitude) <span class="text-danger">*</span></label>
+                                        <input type="number" step="any" class="form-control form-control-sm" id="kinhDo" placeholder="VD: 104.6432" required>
+                                    </div>
+                                    <div class="col-md-4 d-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-primary w-100 fw-semibold" onclick="layGpsAdmin()" title="Lấy GPS thực tế từ thiết bị">
+                                            <i class="fas fa-crosshairs me-1"></i> Lấy GPS
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-warning text-dark w-100 fw-semibold" onclick="tuDongNhanDienAdmin(true)" title="Tự động nhận diện hoa, ong, khí hậu">
+                                            <i class="fas fa-bolt me-1"></i> Nhận diện
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Bản đồ chọn vị trí trực quan -->
+                                <div class="position-relative mt-2">
+                                    <div id="adminPickMap" style="height: 190px; border-radius: 8px; border: 1px solid #cbd5e1; z-index: 1;"></div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted"><i class="fas fa-hand-pointer text-primary me-1"></i> Bấm trực tiếp lên bản đồ để di chuyển ghim & tự điền thông tin.</small>
+                                        <span class="badge bg-white text-secondary border" id="adminMapCoordStatus" style="font-size:0.75rem;">Chưa ghim tọa độ</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alert Box hiển thị kết quả tự động nhận diện -->
+                            <div id="adminEcoAlertBox" class="alert alert-warning py-2 px-3 small mb-3 rounded-3 border-0 shadow-sm d-none" style="background:#fef3c7; color:#92400e;">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-wand-magic-sparkles text-amber me-2 mt-1 fs-6"></i>
+                                    <div id="adminEcoAlertContent" class="flex-grow-1"></div>
+                                </div>
+                            </div>
+
+                            <!-- Nhóm 4: Loài Hoa & Loài Ong Phù Hợp (Có gợi ý tự động & cho phép sửa tùy ý) -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-success d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-seedling me-1"></i> Loài Hoa Đặc Trưng</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-normal" style="font-size: 0.7rem;">Tự động điền • Có thể sửa</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="loaiHoa" list="dlLoaiHoa" placeholder="VD: Hoa mận, Hoa vải thiều, Hoa cà phê...">
+                                    <datalist id="dlLoaiHoa">
+                                        <% if (typeof danhSachHoa !== 'undefined' && danhSachHoa.length) { %>
+                                            <% danhSachHoa.forEach(h => { %>
+                                                <option value="<%= h.tenLoaiHoa %>">
+                                            <% }) %>
+                                        <% } %>
+                                        <option value="Hoa mận, Hoa mơ, Tam giác mạch">
+                                        <option value="Hoa vải thiều đặc sản, Hoa cam">
+                                        <option value="Hoa nhãn lồng, Hoa bưởi">
+                                        <option value="Hoa cà phê, Hoa cao su, Hoa điều">
+                                        <option value="Hoa bạc hà đá núi cao">
+                                        <option value="Hoa tràm rừng U Minh, Hoa dừa">
+                                        <option value="Hoa keo tràm, Hoa rừng tự nhiên">
+                                    </datalist>
+                                    <div class="d-flex flex-wrap gap-1 mt-1" id="flowerChipsContainer">
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa mận, Hoa mơ"><i class="fas fa-tag text-success me-1"></i>Hoa mận, mơ</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa vải thiều đặc sản"><i class="fas fa-tag text-success me-1"></i>Hoa vải thiều</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa nhãn lồng"><i class="fas fa-tag text-success me-1"></i>Hoa nhãn lồng</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa cà phê, Hoa cao su"><i class="fas fa-tag text-success me-1"></i>Hoa cà phê</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa bạc hà núi cao"><i class="fas fa-tag text-success me-1"></i>Hoa bạc hà</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiHoa" data-val="Hoa tràm rừng U Minh"><i class="fas fa-tag text-success me-1"></i>Hoa tràm</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-warning-emphasis d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-certificate me-1"></i> Loài Ong Phù Hợp</span>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-normal" style="font-size: 0.7rem;">Tự động điền • Có thể sửa</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="loaiOngPhuHop" list="dlLoaiOng" placeholder="VD: Ong Ý (Apis mellifera), Ong nội...">
+                                    <datalist id="dlLoaiOng">
+                                        <% if (typeof danhSachOng !== 'undefined' && danhSachOng.length) { %>
+                                            <% danhSachOng.forEach(o => { %>
+                                                <option value="<%= o.tenLoaiOng %>">
+                                            <% }) %>
+                                        <% } %>
+                                        <option value="Ong Ý (Apis mellifera)">
+                                        <option value="Ong nội (Apis cerana)">
+                                        <option value="Ong Ý & Ong nội">
+                                        <option value="Ong dú (Stingless bee)">
+                                    </datalist>
+                                    <div class="d-flex flex-wrap gap-1 mt-1" id="beeChipsContainer">
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiOngPhuHop" data-val="Ong Ý (Apis mellifera)"><i class="fas fa-tag text-warning me-1"></i>Ong Ý</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiOngPhuHop" data-val="Ong nội (Apis cerana)"><i class="fas fa-tag text-warning me-1"></i>Ong nội</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiOngPhuHop" data-val="Ong Ý & Ong nội"><i class="fas fa-tag text-warning me-1"></i>Ong Ý & Ong nội</span>
+                                        <span class="badge bg-light text-dark border px-2 py-1 eco-chip" data-input="loaiOngPhuHop" data-val="Ong dú (Stingless bee)"><i class="fas fa-tag text-warning me-1"></i>Ong dú</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Nhóm 5: Khí Hậu & Pháp Lý -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-info-emphasis d-flex justify-content-between align-items-center">
+                                        <span><i class="fas fa-cloud-sun me-1"></i> Khí Hậu Vùng</span>
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle fw-normal" style="font-size: 0.7rem;">Tự động tính từ GPS</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="khiHau" placeholder="VD: Ôn đới núi cao mát mẻ (16°C - 24°C)">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-dark">Thông Tin Pháp Lý</label>
+                                    <input type="text" class="form-control" id="thongTinPhapLy" placeholder="VD: Sổ đỏ chính chủ, đất nông nghiệp">
+                                </div>
+                            </div>
+
+                            <!-- Nhóm 6: Hình ảnh vườn -->
+                            <div class="mb-2">
+                                <label class="form-label fw-bold small text-dark">Hình Ảnh Thực Tế Của Vườn</label>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="border rounded-3 p-1 bg-light text-center flex-shrink-0" style="width: 76px; height: 76px;">
+                                        <img id="adminImgPreview" src="/images/default-garden.svg" class="w-100 h-100 rounded-2 object-fit-cover" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <input type="text" class="form-control form-control-sm mb-1" id="hinhAnh" placeholder="Dán link ảnh (https://...) hoặc chọn file từ máy tính">
+                                        <input type="file" class="form-control form-control-sm" id="adminImgFile" accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer bg-light py-2">
+                        <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary px-4 fw-bold shadow-sm" onclick="submitThemDiaDiem()">
+                            <i class="fas fa-save me-1"></i> Lưu Địa Điểm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaflet JS & Bootstrap JS -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            // ================= TỪ ĐIỂN TỌA ĐỘ VÀ VÙNG SINH THÁI VIỆT NAM =================
+            const VN_REGIONS = [
+                // Tây Bắc & Miền núi phía Bắc
+                { keys: ['mộc châu', 'moc chau'], lat: 20.8465, lng: 104.6432, name: 'Huyện Mộc Châu, Sơn La', hoa: 'Hoa mận, Hoa mơ, Tam giác mạch, Hoa rừng Tây Bắc', ong: 'Ong nội (Apis cerana)', khiHau: 'Ôn đới núi cao mát mẻ (16°C - 24°C)' },
+                { keys: ['sơn la', 'son la'], lat: 21.3283, lng: 103.9148, name: 'Tỉnh Sơn La', hoa: 'Hoa mận, Hoa mơ, Cà phê Arabica, Hoa ban', ong: 'Ong nội (Apis cerana)', khiHau: 'Cận nhiệt đới vùng núi (18°C - 25°C)' },
+                { keys: ['đồng văn', 'dong van'], lat: 23.2789, lng: 105.3622, name: 'Huyện Đồng Văn, Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên đá khô lạnh, trong lành (14°C - 22°C)' },
+                { keys: ['mèo vạc', 'meo vac'], lat: 23.1633, lng: 105.4128, name: 'Huyện Mèo Vạc, Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên đá khô lạnh (15°C - 22°C)' },
+                { keys: ['hà giang', 'ha giang'], lat: 22.8233, lng: 104.9839, name: 'Tỉnh Hà Giang', hoa: 'Hoa bạc hà đá núi cao, Hoa tam giác mạch, Hoa rừng', ong: 'Ong nội (Apis cerana)', khiHau: 'Cao nguyên núi đá ôn đới (15°C - 23°C)' },
+                { keys: ['sa pa', 'sapa', 'lào cai', 'lao cai'], lat: 22.3364, lng: 103.8438, name: 'Thị xã Sa Pa, Lào Cai', hoa: 'Hoa thảo quả, Hoa đỗ quyên, Hoa đào mận', ong: 'Ong nội (Apis cerana)', khiHau: 'Ôn đới núi cao quanh năm mát lạnh (12°C - 20°C)' },
+                { keys: ['điện biên', 'dien bien'], lat: 21.3869, lng: 103.0233, name: 'Tỉnh Điện Biên', hoa: 'Hoa ban trắng, Hoa mơ mận, Hoa rừng Tây Bắc', ong: 'Ong nội (Apis cerana)', khiHau: 'Nhiệt đới gió mùa vùng núi (20°C - 27°C)' },
+                { keys: ['lai châu', 'lai chau'], lat: 22.3967, lng: 103.4683, name: 'Tỉnh Lai Châu', hoa: 'Hoa chè cổ thụ, Hoa đào, Hoa rừng tự nhiên', ong: 'Ong nội (Apis cerana)', khiHau: 'Cận nhiệt đới núi cao (17°C - 24°C)' },
+                { keys: ['hòa bình', 'hoa binh'], lat: 20.8167, lng: 105.3333, name: 'Tỉnh Hòa Bình', hoa: 'Hoa cam Cao Phong, Hoa bưởi, Hoa rừng tự nhiên', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới ẩm vùng đồi núi (22°C - 28°C)' },
+                { keys: ['yên bái', 'yen bai'], lat: 21.7167, lng: 104.8667, name: 'Tỉnh Yên Bái', hoa: 'Hoa quế, Hoa táo mèo, Hoa rừng Mù Cang Chải', ong: 'Ong nội (Apis cerana)', khiHau: 'Nhiệt đới ẩm gió mùa (20°C - 26°C)' },
+                { keys: ['tuyên quang', 'tuyen quang'], lat: 21.8233, lng: 105.2167, name: 'Tỉnh Tuyên Quang', hoa: 'Hoa keo, Hoa bưởi Soi Hà, Hoa cam Hàm Yên', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa (22°C - 29°C)' },
+                { keys: ['cao bằng', 'cao bang'], lat: 22.6667, lng: 106.2500, name: 'Tỉnh Cao Bằng', hoa: 'Hoa dẻ Trùng Khánh, Hoa lê, Hoa mác mật rừng', ong: 'Ong nội (Apis cerana)', khiHau: 'Ôn hòa vùng núi (18°C - 25°C)' },
+                { keys: ['lạng sơn', 'lang son'], lat: 21.8500, lng: 106.7500, name: 'Tỉnh Lạng Sơn', hoa: 'Hoa hồi xứ Lạng, Hoa mác mật, Hoa đào', ong: 'Ong nội (Apis cerana)', khiHau: 'Cận nhiệt đới gió mùa (19°C - 26°C)' },
+
+                // Đồng bằng sông Hồng & Bắc Bộ
+                { keys: ['lục ngạn', 'luc ngan'], lat: 21.3654, lng: 106.5982, name: 'Huyện Lục Ngạn, Bắc Giang', hoa: 'Hoa vải thiều đặc sản, Hoa cam Lục Ngạn', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Nhiệt đới 4 mùa, mùa hoa ấm áp (22°C - 30°C)' },
+                { keys: ['bắc giang', 'bac giang'], lat: 21.2731, lng: 106.1946, name: 'Tỉnh Bắc Giang', hoa: 'Hoa vải thiều, Hoa nhãn, Hoa bạch đàn', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới gió mùa (22°C - 30°C)' },
+                { keys: ['hưng yên', 'hung yen'], lat: 20.6562, lng: 106.0511, name: 'Tỉnh Hưng Yên', hoa: 'Hoa nhãn lồng Phố Hiến, Hoa bưởi, Hoa táo', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Nhiệt đới ẩm gió mùa (22°C - 30°C)' },
+                { keys: ['hải dương', 'hai duong'], lat: 20.9372, lng: 106.3145, name: 'Tỉnh Hải Dương', hoa: 'Hoa vải Thanh Hà, Hoa ổi, Hoa nhãn', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới ẩm gió mùa (22°C - 30°C)' },
+                { keys: ['hà nội', 'ha noi'], lat: 21.0285, lng: 105.8542, name: 'Thủ đô Hà Nội', hoa: 'Hoa nhãn, Hoa bưởi Diễn, Hoa sen Tây Hồ, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa ẩm (22°C - 31°C)' },
+                { keys: ['bắc ninh', 'bac ninh'], lat: 21.1861, lng: 106.0763, name: 'Tỉnh Bắc Ninh', hoa: 'Hoa nhãn, Hoa cà rốt, Hoa ăn trái', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa (22°C - 30°C)' },
+                { keys: ['hải phòng', 'hai phong'], lat: 20.8449, lng: 106.6881, name: 'Thành phố Hải Phòng', hoa: 'Hoa keo, Hoa rừng Cát Bà, Hoa nhãn', ong: 'Ong nội & Ong Ý', khiHau: 'Duyên hải Bắc Bộ (23°C - 30°C)' },
+                { keys: ['quảng ninh', 'quang ninh'], lat: 20.9500, lng: 107.0833, name: 'Tỉnh Quảng Ninh', hoa: 'Hoa keo tràm, Hoa ba kích, Hoa rừng tự nhiên', ong: 'Ong nội (Apis cerana)', khiHau: 'Duyên hải ôn hòa (22°C - 29°C)' },
+                { keys: ['nam định', 'nam dinh'], lat: 20.4333, lng: 106.1667, name: 'Tỉnh Nam Định', hoa: 'Hoa báng ven biển, Hoa nhãn lồng, Hoa táo', ong: 'Ong Ý & Ong nội', khiHau: 'Đồng bằng ven biển (23°C - 30°C)' },
+                { keys: ['thái bình', 'thai binh'], lat: 20.4500, lng: 106.3333, name: 'Tỉnh Thái Bình', hoa: 'Hoa lúa, Hoa nhãn, Hoa rau màu', ong: 'Ong Ý & Ong nội', khiHau: 'Đồng bằng phù sa (23°C - 30°C)' },
+                { keys: ['ninh bình', 'ninh binh'], lat: 20.2500, lng: 105.9750, name: 'Tỉnh Ninh Bình', hoa: 'Hoa rừng Cúc Phương, Hoa nhãn, Hoa sen', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới ẩm đá vôi (22°C - 30°C)' },
+                { keys: ['hà nam', 'ha nam'], lat: 20.5833, lng: 105.9167, name: 'Tỉnh Hà Nam', hoa: 'Hoa nhãn, Hoa chuối ngự, Hoa bưởi', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới ẩm gió mùa (22°C - 30°C)' },
+                { keys: ['phú thọ', 'phu tho'], lat: 21.3167, lng: 105.2167, name: 'Tỉnh Phú Thọ', hoa: 'Hoa chè trung du, Hoa bưởi Đoan Hùng, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Bán sơn địa nhiệt đới (22°C - 29°C)' },
+                { keys: ['vĩnh phúc', 'vinh phuc'], lat: 21.3089, lng: 105.6044, name: 'Tỉnh Vĩnh Phúc', hoa: 'Hoa rừng Tam Đảo, Hoa ăn trái, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa (22°C - 29°C)' },
+
+                // Bắc Trung Bộ & Duyên hải Miền Trung
+                { keys: ['thanh hóa', 'thanh hoa'], lat: 19.8067, lng: 105.7852, name: 'Tỉnh Thanh Hóa', hoa: 'Hoa keo tràm, Hoa rừng Bến En, Hoa cam', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa miền Trung (23°C - 31°C)' },
+                { keys: ['nghệ an', 'nghe an'], lat: 19.3000, lng: 105.0000, name: 'Tỉnh Nghệ An', hoa: 'Hoa cam Xã Đoài, Hoa keo tràm, Hoa rừng Pù Mát', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa nắng ấm (24°C - 32°C)' },
+                { keys: ['hà tĩnh', 'ha tinh'], lat: 18.3333, lng: 105.9000, name: 'Tỉnh Hà Tĩnh', hoa: 'Hoa cam Bù Hương Sơn, Hoa bưởi Phúc Trạch, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa (24°C - 32°C)' },
+                { keys: ['quảng bình', 'quang binh'], lat: 17.4833, lng: 106.6000, name: 'Tỉnh Quảng Bình', hoa: 'Hoa rừng Phong Nha, Hoa keo lai, Hoa tràm', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa (24°C - 32°C)' },
+                { keys: ['quảng trị', 'quang tri'], lat: 16.7500, lng: 107.1833, name: 'Tỉnh Quảng Trị', hoa: 'Hoa tràm, Hoa cà phê Khe Sanh, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió Tây Nam (25°C - 33°C)' },
+                { keys: ['huế', 'thừa thiên huế', 'thua thien hue'], lat: 16.4637, lng: 107.5909, name: 'Tỉnh Thừa Thiên Huế', hoa: 'Hoa thanh trà Huế, Hoa tràm gió, Hoa keo', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới gió mùa duyên hải (24°C - 31°C)' },
+                { keys: ['đà nẵng', 'da nang'], lat: 16.0544, lng: 108.2022, name: 'Thành phố Đà Nẵng', hoa: 'Hoa rừng Bà Nà, Hoa keo lai, Hoa ăn trái', ong: 'Ong nội & Ong Ý', khiHau: 'Nhiệt đới duyên hải (25°C - 32°C)' },
+                { keys: ['quảng nam', 'quang nam'], lat: 15.5833, lng: 108.4167, name: 'Tỉnh Quảng Nam', hoa: 'Hoa quế Trà My, Hoa keo lai, Hoa sâm Ngọc Linh', ong: 'Ong nội (Apis cerana)', khiHau: 'Nhiệt đới đồi núi (24°C - 31°C)' },
+                { keys: ['quảng ngãi', 'quang ngai'], lat: 15.1167, lng: 108.8000, name: 'Tỉnh Quảng Ngãi', hoa: 'Hoa keo lai, Hoa dừa, Hoa quế Trà Bồng', ong: 'Ong Ý & Ong nội', khiHau: 'Duyên hải nắng ấm (26°C - 32°C)' },
+                { keys: ['bình định', 'binh dinh'], lat: 14.1667, lng: 109.0000, name: 'Tỉnh Bình Định', hoa: 'Hoa dừa Tam Quan, Hoa xoài, Hoa keo', ong: 'Ong Ý & Ong nội', khiHau: 'Duyên hải nhiệt đới (26°C - 32°C)' },
+                { keys: ['phú yên', 'phu yen'], lat: 13.0833, lng: 109.0833, name: 'Tỉnh Phú Yên', hoa: 'Hoa keo, Hoa dừa, Hoa ăn trái Sông Hinh', ong: 'Ong Ý & Ong nội', khiHau: 'Duyên hải miền Trung nắng gió (26°C - 32°C)' },
+                { keys: ['khánh hòa', 'khanh hoa', 'nha trang'], lat: 12.2388, lng: 109.1967, name: 'Tỉnh Khánh Hòa (Nha Trang)', hoa: 'Hoa xoài Cam Ranh, Hoa keo tràm, Hoa bưởi da xanh', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Duyên hải Nam Trung Bộ nắng ấm (26°C - 32°C)' },
+                { keys: ['ninh thuận', 'ninh thuan', 'phan rang'], lat: 11.5667, lng: 108.9833, name: 'Tỉnh Ninh Thuận (Phan Rang)', hoa: 'Hoa táo, Hoa nho Phan Rang, Hoa keo khô hạn', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Bán khô hạn nhiệt đới nắng nhiều (27°C - 34°C)' },
+                { keys: ['bình thuận', 'binh thuan', 'phan thiết'], lat: 10.9333, lng: 108.1000, name: 'Tỉnh Bình Thuận (Phan Thiết)', hoa: 'Hoa thanh long, Hoa điều, Hoa keo lá tràm', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới duyên hải nắng ấm (26°C - 33°C)' },
+
+                // Tây Nguyên
+                { keys: ['buôn ma thuột', 'buon ma thuot', 'đắk lắk', 'dak lak'], lat: 12.6667, lng: 108.0500, name: 'Tỉnh Đắk Lắk (Buôn Ma Thuột)', hoa: 'Hoa cà phê Robusta, Hoa cao su, Hoa điều, Hoa bơ', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Cao nguyên ôn hòa đất đỏ bazan (20°C - 28°C)' },
+                { keys: ['đà lạt', 'da lat'], lat: 11.9404, lng: 108.4583, name: 'Thành phố Đà Lạt, Lâm Đồng', hoa: 'Hoa cà phê Arabica, Hoa dã quỳ, Hoa thông, Hoa bơ', ong: 'Ong Ý (Apis mellifera) & Ong nội', khiHau: 'Cao nguyên ôn đới quanh năm mát mẻ (16°C - 23°C)' },
+                { keys: ['bảo lộc', 'bao loc', 'lâm đồng', 'lam dong'], lat: 11.5458, lng: 107.8083, name: 'Tỉnh Lâm Đồng (Bảo Lộc)', hoa: 'Hoa cà phê, Hoa chè B\'lao, Hoa dâu tằm, Hoa sầu riêng', ong: 'Ong Ý & Ong nội', khiHau: 'Cao nguyên mát mẻ quanh năm (18°C - 25°C)' },
+                { keys: ['pleiku', 'gia lai'], lat: 13.9833, lng: 108.0000, name: 'Tỉnh Gia Lai (Pleiku)', hoa: 'Hoa cà phê, Hoa cao su, Hoa chè Biển Hồ', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Cao nguyên ôn hòa 2 mùa mưa nắng (20°C - 28°C)' },
+                { keys: ['đắk nông', 'dak nong'], lat: 12.0000, lng: 107.6833, name: 'Tỉnh Đắk Nông', hoa: 'Hoa cà phê, Hoa tiêu, Hoa bơ, Hoa sầu riêng', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Cao nguyên đất đỏ bazan mát mẻ (20°C - 28°C)' },
+                { keys: ['kon tum'], lat: 14.3500, lng: 108.0000, name: 'Tỉnh Kon Tum', hoa: 'Hoa cà phê, Hoa cao su, Hoa sâm Ngọc Linh rừng', ong: 'Ong Ý & Ong nội', khiHau: 'Cao nguyên mát mẻ (19°C - 27°C)' },
+
+                // Đông Nam Bộ
+                { keys: ['bình phước', 'binh phuoc'], lat: 11.7512, lng: 106.9027, name: 'Tỉnh Bình Phước', hoa: 'Hoa điều thủ phủ, Hoa cao su, Hoa tràm bông vàng', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới nắng ấm Đông Nam Bộ (25°C - 33°C)' },
+                { keys: ['đồng nai', 'dong nai'], lat: 11.0500, lng: 107.1667, name: 'Tỉnh Đồng Nai', hoa: 'Hoa chôm chôm Long Khánh, Hoa sầu riêng, Hoa cao su', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới gió mùa nắng ấm (26°C - 33°C)' },
+                { keys: ['tây ninh', 'tay ninh'], lat: 11.3100, lng: 106.0983, name: 'Tỉnh Tây Ninh', hoa: 'Hoa mãng cầu Bà Đen, Hoa cao su, Hoa keo tràm', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới nắng ấm (26°C - 34°C)' },
+                { keys: ['bình dương', 'binh duong'], lat: 11.1667, lng: 106.6667, name: 'Tỉnh Bình Dương', hoa: 'Hoa măng cụt Lái Thiêu, Hoa cao su, Hoa ăn trái', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới nắng ấm (26°C - 33°C)' },
+                                { keys: ['củ chi', 'cu chi', 'phú hòa đông', 'phu hoa dong'], lat: 11.0053, lng: 106.5441, name: 'Huyện Củ Chi, TP. Hồ Chí Minh', hoa: 'Hoa cây ăn trái Củ Chi, Hoa tràm bông vàng, Hoa cao su', ong: 'Ong Ý (Apis mellifera) & Ong dú', khiHau: 'Nhiệt đới nắng ấm Đông Nam Bộ (26°C - 34°C)' },
+                { keys: ['hóc môn', 'hoc mon'], lat: 10.8872, lng: 106.5925, name: 'Huyện Hóc Môn, TP. Hồ Chí Minh', hoa: 'Hoa cây ăn trái, Hoa tràm, Hoa rau màu', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới nắng ấm (26°C - 34°C)' },
+                { keys: ['bình chánh', 'binh chanh'], lat: 10.6872, lng: 106.5750, name: 'Huyện Bình Chánh, TP. Hồ Chí Minh', hoa: 'Hoa mai vàng Bình Lợi, Hoa tràm, Hoa ăn trái', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới nắng ấm (26°C - 34°C)' },
+                { keys: ['cần giờ', 'can gio'], lat: 10.4167, lng: 106.9667, name: 'Huyện Cần Giờ, TP. Hồ Chí Minh', hoa: 'Hoa rừng ngập mặn Cần Giờ, Hoa tràm, Hoa dừa nước', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Rừng ngập mặn duyên hải nắng ấm (27°C - 33°C)' },
+                { keys: ['hồ chí minh', 'ho chi minh', 'sài gòn', 'sai gon'], lat: 10.8231, lng: 106.6297, name: 'Thành phố Hồ Chí Minh', hoa: 'Hoa tràm Cần Giờ, Hoa cây ăn trái Củ Chi, Hoa dừa', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Nhiệt đới gió mùa nắng ấm (27°C - 34°C)' },
+                { keys: ['bà rịa', 'ba ria', 'vũng tàu', 'vung tau'], lat: 10.4967, lng: 107.1683, name: 'Tỉnh Bà Rịa - Vũng Tàu', hoa: 'Hoa nhãn xuồng cơm vàng, Hoa điều, Hoa tràm', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Duyên hải nhiệt đới nắng gió (26°C - 32°C)' },
+
+                // Tây Nam Bộ (Đồng bằng sông Cửu Long)
+                { keys: ['u minh', 'cà mau', 'ca mau'], lat: 9.1769, lng: 105.1500, name: 'Tỉnh Cà Mau (Rừng U Minh)', hoa: 'Hoa tràm rừng U Minh, Hoa đước, Hoa dừa nước', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Nhiệt đới ẩm Nam Bộ nắng ấm (27°C - 33°C)' },
+                { keys: ['bến tre', 'ben tre'], lat: 10.2433, lng: 106.3756, name: 'Tỉnh Bến Tre (Xứ Dừa)', hoa: 'Hoa dừa Bến Tre, Hoa nhãn, Hoa bưởi da xanh, Hoa chôm chôm', ong: 'Ong Ý & Ong dú (Stingless bee)', khiHau: 'Nhiệt đới ẩm phù sa sông Tiền (27°C - 32°C)' },
+                { keys: ['cần thơ', 'can tho'], lat: 10.0333, lng: 105.7833, name: 'Thành phố Cần Thơ', hoa: 'Hoa nhãn Phong Điền, Hoa vú sữa, Hoa dừa', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới ẩm phù sa (27°C - 33°C)' },
+                { keys: ['tiền giang', 'tien giang'], lat: 10.4167, lng: 106.3333, name: 'Tỉnh Tiền Giang', hoa: 'Hoa xoài Cát Hòa Lộc, Hoa sầu riêng Cai Lậy, Hoa thanh long', ong: 'Ong Ý (Apis mellifera)', khiHau: 'Nhiệt đới đồng bằng (27°C - 33°C)' },
+                { keys: ['vĩnh long', 'vinh long'], lat: 10.2500, lng: 105.9667, name: 'Tỉnh Vĩnh Long', hoa: 'Hoa bưởi Năm Roi Bình Minh, Hoa cam sành Tam Bình, Hoa nhãn', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới ôn hòa sông nước (27°C - 32°C)' },
+                { keys: ['đồng tháp', 'dong thap'], lat: 10.4667, lng: 105.6333, name: 'Tỉnh Đồng Tháp', hoa: 'Hoa sen Đồng Tháp Mười, Hoa xoài Cao Lãnh, Hoa nhãn Châu Thành', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới ẩm đồng bằng (27°C - 33°C)' },
+                { keys: ['an giang', 'an giang'], lat: 10.3833, lng: 105.4333, name: 'Tỉnh An Giang', hoa: 'Hoa thốt nốt Bảy Núi, Hoa xoài ba màu, Hoa keo tràm', ong: 'Ong Ý & Ong nội', khiHau: 'Nhiệt đới biên giới Tây Nam (27°C - 34°C)' },
+                { keys: ['kiên giang', 'kien giang', 'phú quốc', 'phu quoc'], lat: 10.0167, lng: 105.0833, name: 'Tỉnh Kiên Giang (Phú Quốc)', hoa: 'Hoa sim rừng Phú Quốc, Hoa tràm U Minh Thượng, Hoa dừa', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới biển đảo (27°C - 32°C)' },
+                { keys: ['hậu giang', 'hau giang'], lat: 9.7833, lng: 105.4667, name: 'Tỉnh Hậu Giang', hoa: 'Hoa khóm Cầu Đúc, Hoa cam sành, Hoa tràm', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới gió mùa (27°C - 33°C)' },
+                { keys: ['sóc trăng', 'soc trang'], lat: 9.6000, lng: 105.9667, name: 'Tỉnh Sóc Trăng', hoa: 'Hoa nhãn tím, Hoa bưởi, Hoa dừa', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới duyên hải (27°C - 33°C)' },
+                { keys: ['trà vinh', 'tra vinh'], lat: 9.9333, lng: 106.3333, name: 'Tỉnh Trà Vinh', hoa: 'Hoa dừa sáp Cầu Kè, Hoa nhãn, Hoa cây ăn trái', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới ven biển (27°C - 32°C)' },
+                { keys: ['bạc liêu', 'bac lieu'], lat: 9.2833, lng: 105.7167, name: 'Tỉnh Bạc Liêu', hoa: 'Hoa nhãn cổ Bạc Liêu, Hoa tràm, Hoa ăn trái', ong: 'Ong Ý & Ong dú', khiHau: 'Nhiệt đới nắng gió Nam Bộ (27°C - 33°C)' }
+            ];
+
+            // Hàm tính khoảng cách địa lý (Haversine km)
+            function findClosestRegion(lat, lng) {
+                let nearest = null;
+                let minDist = Infinity;
+                for (const reg of VN_REGIONS) {
+                    const dLat = (reg.lat - lat) * 111;
+                    const dLng = (reg.lng - lng) * 111 * Math.cos(lat * Math.PI / 180);
+                    const dist = Math.sqrt(dLat * dLat + dLng * dLng);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = reg;
+                    }
+                }
+                return { region: nearest, distance: minDist };
+            }
+
+            // ================= NHẬN DIỆN SINH THÁI KHU VỰC (HOA, ONG, KHÍ HẬU) =================
+            function detectEcology(lat, lng, addressText = '') {
+                const raw = (addressText || '').toLowerCase();
+                const norm = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+                // 1. Khớp từ khóa địa chỉ nếu có
+                if (raw.trim()) {
+                    for (const reg of VN_REGIONS) {
+                        const match = reg.keys.some(k => raw.includes(k) || norm.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+                        if (match) {
+                            return {
+                                khiHau: reg.khiHau,
+                                loaiHoa: reg.hoa,
+                                loaiOng: reg.ong,
+                                regionName: reg.name,
+                                source: 'address_keyword'
+                            };
+                        }
+                    }
+                }
+
+                // 2. Khớp theo khoảng cách tọa độ địa lý gần nhất trong lãnh thổ Việt Nam
+                if (lat != null && !isNaN(lat) && lng != null && !isNaN(lng)) {
+                    const closest = findClosestRegion(lat, lng);
+                    if (closest.region && closest.distance <= 150) {
+                        return {
+                            khiHau: closest.region.khiHau,
+                            loaiHoa: closest.region.hoa,
+                            loaiOng: closest.region.ong,
+                            regionName: closest.region.name,
+                            distance: Math.round(closest.distance),
+                            source: 'coordinate_distance'
+                        };
+                    }
+                }
+
+                // 3. Fallback theo dải vĩ độ
+                let khiHau = 'Nhiệt đới gió mùa';
+                let loaiHoa = 'Hoa rừng tự nhiên, Hoa nhãn';
+                let loaiOng = 'Ong nội (Apis cerana)';
+                if (lat != null && !isNaN(lat)) {
+                    if (lat >= 21.0) {
+                        khiHau = 'Cận nhiệt đới / Ôn hòa 4 mùa';
+                        loaiHoa = 'Hoa nhãn, Hoa vải, Hoa mận, Hoa rừng tự nhiên';
+                        loaiOng = 'Ong nội & Ong Ý';
+                    } else if (lat >= 16.0 && lat < 21.0) {
+                        khiHau = 'Nhiệt đới gió mùa miền Trung';
+                        loaiHoa = 'Hoa keo tràm, Hoa rừng tự nhiên';
+                        loaiOng = 'Ong nội & Ong Ý';
+                    } else if (lat >= 11.5 && lat < 16.0) {
+                        khiHau = 'Cao nguyên ôn hòa đất đỏ bazan';
+                        loaiHoa = 'Hoa cà phê, Hoa cao su, Hoa điều';
+                        loaiOng = 'Ong Ý (Apis mellifera)';
+                    } else {
+                        khiHau = 'Nhiệt đới ẩm Nam Bộ nắng ấm';
+                        loaiHoa = 'Hoa tràm, Hoa dừa, Cây ăn trái';
+                        loaiOng = 'Ong Ý & Ong dú';
+                    }
+                }
+
+                return { khiHau, loaiHoa, loaiOng, regionName: 'Việt Nam', source: 'latitude_band' };
+            }
+
+            // ================= KHỞI TẠO BẢN ĐỒ ADMIN & GHIM VỊ TRÍ =================
+            let adminPickMap = null;
+            let adminMarker = null;
+
+            function initAdminPickMap() {
+                if (adminPickMap) {
+                    adminPickMap.invalidateSize();
+                    return;
+                }
+                const container = document.getElementById('adminPickMap');
+                if (!container) return;
+
+                const defaultCenter = [21.0285, 105.8542]; // Mặc định Hà Nội
+                adminPickMap = L.map('adminPickMap').setView(defaultCenter, 6);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(adminPickMap);
+
+                // Khi click trực tiếp lên bản đồ -> ghim marker & xử lý tọa độ thực tế ngay lập tức
+                adminPickMap.on('click', function(e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    capNhatBanDoAdmin(lat, lng, false);
+                    xuLyToaDoThucTe(lat, lng, true);
+                });
+            }
+
+            function capNhatBanDoAdmin(lat, lng, setView = true, zoom = 14) {
+                if (!adminPickMap) initAdminPickMap();
+                const latNum = Number(lat);
+                const lngNum = Number(lng);
+                if (isNaN(latNum) || isNaN(lngNum)) return;
+
+                document.getElementById('viDo').value = latNum.toFixed(6);
+                document.getElementById('kinhDo').value = lngNum.toFixed(6);
+
+                const statusEl = document.getElementById('adminMapCoordStatus');
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Đã ghim: ${latNum.toFixed(4)}, ${lngNum.toFixed(4)}`;
+                }
+
+                if (adminMarker) {
+                    adminMarker.setLatLng([latNum, lngNum]);
+                } else {
+                    adminMarker = L.marker([latNum, lngNum], { draggable: true }).addTo(adminPickMap);
+                    adminMarker.on('dragend', function(e) {
+                        const pos = e.target.getLatLng();
+                        capNhatBanDoAdmin(pos.lat, pos.lng, false);
+                        xuLyToaDoThucTe(pos.lat, pos.lng, true);
+                    });
+                }
+                if (setView) {
+                    adminPickMap.setView([latNum, lngNum], zoom);
+                }
+            }
+
+            // Xử lý tọa độ thực tế: Điền hoa, ong, khí hậu và cập nhật địa chỉ tự động
+            async function xuLyToaDoThucTe(lat, lng, updateAddressField = true) {
+                // 1. Tìm vùng gần nhất từ từ điển tọa độ
+                const closest = findClosestRegion(lat, lng);
+                const addrInput = document.getElementById('diaChiChiTiet');
+
+                // Nếu ô địa chỉ đang trống hoặc cần tự động điền
+                if (updateAddressField && closest.region) {
+                    addrInput.value = closest.region.name;
+                }
+
+                // 2. Tự động nhận diện sinh thái ngay lập tức
+                tuDongNhanDienAdmin(true);
+
+                // 3. Gọi Nominatim Reverse Geocoding chạy ngầm để lấy tên Xã/Huyện chi tiết hơn (nếu có mạng)
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 2500);
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&addressdetails=1`, {
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data && data.display_name) {
+                            // Tạo tên ngắn gọn: Xã/Phường, Huyện/Quận, Tỉnh/TP
+                            const a = data.address || {};
+                            const shortParts = [
+                                a.village || a.suburb || a.quarter || a.town || a.hamlet,
+                                a.district || a.county || a.city_district,
+                                a.state || a.province || a.city
+                            ].filter(Boolean);
+                            const cleanAddr = shortParts.length ? shortParts.join(', ') : data.display_name.split(',').slice(0, 3).join(',');
+                            if (cleanAddr && updateAddressField) {
+                                addrInput.value = cleanAddr;
+                                tuDongNhanDienAdmin(false); // Cập nhật lại sinh thái theo tên cụ thể
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // Fallback đã có closest.region.name
+                }
+            }
+
+            // Tự động nhận diện sinh thái và điền vào các ô
+            function tuDongNhanDienAdmin(showNotification = false) {
+                const lat = parseFloat(document.getElementById('viDo').value);
+                const lng = parseFloat(document.getElementById('kinhDo').value);
+                const diaChi = document.getElementById('diaChiChiTiet').value;
+
+                const eco = detectEcology(isNaN(lat) ? null : lat, isNaN(lng) ? null : lng, diaChi);
+
+                const loaiHoaInput = document.getElementById('loaiHoa');
+                const loaiOngInput = document.getElementById('loaiOngPhuHop');
+                const khiHauInput = document.getElementById('khiHau');
+
+                if (loaiHoaInput) loaiHoaInput.value = eco.loaiHoa;
+                if (loaiOngInput) loaiOngInput.value = eco.loaiOng;
+                if (khiHauInput) khiHauInput.value = eco.khiHau;
+
+                const alertBox = document.getElementById('adminEcoAlertBox');
+                const alertContent = document.getElementById('adminEcoAlertContent');
+                if (alertBox && alertContent) {
+                    const locationLabel = eco.regionName ? ` (Khu vực: <b>${eco.regionName}</b>)` : '';
+                    alertContent.innerHTML = `
+                        <div><strong>⚡ Đã tự động nhận diện theo vị trí${locationLabel}:</strong></div>
+                        <div class="mt-1">
+                            • Loài hoa đặc trưng: <b class="text-success">${eco.loaiHoa}</b><br>
+                            • Giống ong thích hợp: <b class="text-warning-emphasis">${eco.loaiOng}</b><br>
+                            • Khí hậu vùng: <i>${eco.khiHau}</i>
+                        </div>
+                        <div class="text-muted small mt-1"><i class="fas fa-edit me-1"></i>Các trường trên đã được điền tự động. Bạn vẫn có thể chỉnh sửa tùy ý hoặc bấm gợi ý bên dưới.</div>
+                    `;
+                    alertBox.classList.remove('d-none');
+                }
+            }
+
+            // Lấy GPS từ thiết bị (Vị trí hiện tại)
+            function layGpsAdmin() {
+                if (!navigator.geolocation) {
+                    alert('Trình duyệt không hỗ trợ Geolocation GPS.');
+                    return;
+                }
+
+                const statusEl = document.getElementById('adminMapCoordStatus');
+                if (statusEl) {
+                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-primary me-1"></i> Đang lấy GPS...';
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (p) => {
+                        const lat = p.coords.latitude;
+                        const lng = p.coords.longitude;
+                        capNhatBanDoAdmin(lat, lng, true, 15);
+                        xuLyToaDoThucTe(lat, lng, true);
+                    },
+                    (err) => {
+                        alert('Không thể lấy GPS từ thiết bị (' + err.message + '). Bạn hãy bấm trực tiếp lên bản đồ để chọn vị trí hoặc gõ tên địa phương vào ô tìm kiếm!');
+                        if (statusEl) {
+                            statusEl.innerHTML = '<i class="fas fa-exclamation-triangle text-warning me-1"></i> Chưa có GPS';
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                );
+            }
+
+            // ================= TÌM KIẾM ĐỊA ĐIỂM VÀ TỰ ĐỘNG GỢI Ý KHI NHẬP (HỖ TRỢ ĐỊA CHỈ CHI TIẾT) =================
+            
+            // ================= TÁCH VÀ TẠO CÁC CẤP ĐỘ ĐỊA CHỈ PHÙ HỢP (HỖ TRỢ SỐ NHÀ, NGÕ, HẺM) =================
+            function generateAddressCandidates(input) {
+                const list = [];
+                const clean = (input || '').trim();
+                if (!clean) return list;
+
+                // 1. Tách bỏ số nhà, số hẻm (VD: '283/2 ' hoặc 'Số 15 ngõ 120 ' -> 'Đường Nguyễn Thị Nê, Phú Hòa Đông, Củ Chi...')
+                const stripped = clean
+                    .replace(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*\s*,?\s*/i, '')
+                    .replace(/^(số|số nhà|nhà số|hẻm|ngõ|ngách|thửa|lô)\s+[0-9A-Za-z\/\.\-]+\s*,?\s*/i, '')
+                    .trim();
+
+                // Ưu tiên địa chỉ đã bỏ số nhà trước vì dữ liệu bản đồ VN chủ yếu lưu theo Tên Đường / Xã / Huyện
+                if (stripped && stripped !== clean) {
+                    list.push(stripped);
+                }
+
+                // 2. Phân tách theo dấu phẩy để tìm theo cấp: Đường + Huyện + Tỉnh hoặc Xã + Huyện + Tỉnh
+                const parts = clean.split(',').map(p => p.trim()).filter(Boolean);
+                if (parts.length >= 3) {
+                    // Bỏ phần đầu (thường là số nhà/thôn/ấp/ngõ)
+                    const withoutFirst = parts.slice(1).join(', ');
+                    if (!list.includes(withoutFirst)) list.push(withoutFirst);
+
+                    if (parts.length >= 4) {
+                        // Tên đường + Huyện + Tỉnh
+                        const pStreet = parts[0].replace(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*\s*/i, '').trim();
+                        const streetDistCity = [pStreet, parts[parts.length - 2], parts[parts.length - 1]].join(', ');
+                        if (!list.includes(streetDistCity)) list.push(streetDistCity);
+
+                        // Xã/Phường + Huyện + Tỉnh
+                        const communeDistCity = parts.slice(parts.length - 3).join(', ');
+                        if (!list.includes(communeDistCity)) list.push(communeDistCity);
+                    }
+
+                    // Huyện + Tỉnh
+                    const distCity = parts.slice(parts.length - 2).join(', ');
+                    if (!list.includes(distCity)) list.push(distCity);
+                }
+
+                // Đưa cả chuỗi gốc vào danh sách thử nghiệm
+                if (!list.includes(clean)) list.push(clean);
+
+                return list;
+            }
+
+            // Gọi Geocoder đa tầng (Photon Komoot OSM + Nominatim + Từ điển nội bộ)
+            async function findLocationCascade(address) {
+                const candidates = generateAddressCandidates(address);
+
+                // 1. Thử qua Photon Komoot OSM (chuyên xử lý tên đường, thôn xóm, không bị chặn User-Agent)
+                for (const c of candidates) {
+                    try {
+                        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(c)}&limit=3`;
+                        const res = await fetch(url, { signal: AbortSignal.timeout(2800) });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d && d.features && d.features.length) {
+                                for (const f of d.features) {
+                                    const [lon, lat] = f.geometry.coordinates;
+                                    // Kiểm tra tọa độ thuộc lãnh thổ Việt Nam
+                                    if (lat > 8.0 && lat < 24.0 && lon > 102.0 && lon < 110.0) {
+                                        const p = f.properties || {};
+                                        const foundTitle = [p.name, p.district, p.city].filter(Boolean).join(', ');
+                                        return {
+                                            lat: lat,
+                                            lng: lon,
+                                            matchedQuery: c,
+                                            displayName: foundTitle || p.name || c,
+                                            source: 'photon'
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        // Thử candidate tiếp theo
+                    }
+                }
+
+                // 2. Thử qua OpenStreetMap Nominatim
+                for (const c of candidates) {
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(c + ', Vietnam')}&limit=1`;
+                        const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d && d.length > 0) {
+                                const lat = parseFloat(d[0].lat);
+                                const lon = parseFloat(d[0].lon);
+                                if (!isNaN(lat) && !isNaN(lon)) {
+                                    return {
+                                        lat: lat,
+                                        lng: lon,
+                                        matchedQuery: c,
+                                        displayName: d[0].display_name.split(',').slice(0, 3).join(','),
+                                        source: 'nominatim'
+                                    };
+                                }
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                // 3. Tra cứu từ điển khu vực sinh thái nội bộ VN_REGIONS
+                const raw = address.toLowerCase();
+                const norm = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                for (const reg of VN_REGIONS) {
+                    const match = reg.keys.some(k => raw.includes(k) || norm.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+                    if (match) {
+                        return {
+                            lat: reg.lat,
+                            lng: reg.lng,
+                            matchedQuery: reg.name,
+                            displayName: reg.name,
+                            source: 'local_database'
+                        };
+                    }
+                }
+
+                return null;
+            }
+
+
+            let searchDebounceTimer = null;
+
+            // Xử lý autocomplete gợi ý địa điểm khi người dùng gõ
+            function handleAddressInputAutocomplete(e) {
+                clearTimeout(searchDebounceTimer);
+                const query = (e.target.value || '').trim();
+                const dropdown = document.getElementById('diaChiSuggestionsDropdown');
+
+                if (query.length < 1) {
+                    dropdown.classList.add('d-none');
+                    dropdown.innerHTML = '';
+                    return;
+                }
+
+                searchDebounceTimer = setTimeout(async () => {
+                    const raw = query.toLowerCase();
+                    const norm = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+                    // 1. Tách số nhà để tìm tên đường / khu vực sạch
+                    const cleanedStreet = query
+                        .replace(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*\s*,?\s*/i, '')
+                        .replace(/^(số|số nhà|nhà số|hẻm|ngõ|ngách|thửa|lô)\s+[0-9A-Za-z\/\.\-]+\s*,?\s*/i, '')
+                        .trim();
+
+                    // 2. Tìm trong từ điển nội bộ VN_REGIONS
+                    const localMatches = VN_REGIONS.filter(r => {
+                        const nameNorm = r.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                        return r.name.toLowerCase().includes(raw) ||
+                               nameNorm.includes(norm) ||
+                               r.keys.some(k => k.includes(raw) || raw.includes(k) || norm.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, '')));
+                    }).slice(0, 5);
+
+                    // 3. Thử tìm qua Photon Komoot OSM với chuỗi đã làm sạch
+                    let remoteMatches = [];
+                    const qSearch = cleanedStreet && cleanedStreet.length >= 3 ? cleanedStreet : query;
+                    try {
+                        const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(qSearch)}&limit=5`;
+                        const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
+                        if (res.ok) {
+                            const d = await res.json();
+                            if (d && d.features && d.features.length) {
+                                for (const f of d.features) {
+                                    const [lon, lat] = f.geometry.coordinates;
+                                    if (lat > 8.0 && lat < 24.0 && lon > 102.0 && lon < 110.0) {
+                                        const p = f.properties || {};
+                                        const title = [p.name, p.district, p.city].filter(Boolean).join(', ');
+                                        if (title) {
+                                            remoteMatches.push({
+                                                name: title,
+                                                lat: lat,
+                                                lng: lon,
+                                                isRemote: true
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } catch (err) {}
+
+                    // Gộp kết quả và lọc trùng
+                    const combined = [...localMatches];
+                    for (const rm of remoteMatches) {
+                        if (!combined.some(c => Math.abs(c.lat - rm.lat) < 0.02 && Math.abs(c.lng - rm.lng) < 0.02)) {
+                            combined.push(rm);
+                        }
+                    }
+
+                    if (combined.length === 0) {
+                        dropdown.innerHTML = `<div class="p-2 text-muted small text-center"><i class="fas fa-info-circle me-1"></i> Bấm nút "Tìm Vị Trí" để hệ thống phân tích định vị chi tiết địa chỉ này.</div>`;
+                        dropdown.classList.remove('d-none');
+                        return;
+                    }
+
+                    // Hiển thị danh sách gợi ý
+                    dropdown.innerHTML = combined.slice(0, 6).map(item => {
+                        const eco = detectEcology(item.lat, item.lng, item.name);
+                        return `
+                            <button type="button" class="list-group-item list-group-item-action py-2 px-3 d-flex justify-content-between align-items-center suggestion-loc-item"
+                                data-name="${item.name}" data-lat="${item.lat}" data-lng="${item.lng}">
+                                <div class="text-start">
+                                    <div class="fw-bold text-dark small">
+                                        <i class="fas fa-map-marker-alt text-danger me-1"></i> ${item.name}
+                                    </div>
+                                    <div class="text-muted" style="font-size: 0.73rem;">
+                                        <span class="text-success me-2"><i class="fas fa-seedling me-1"></i>${eco.loaiHoa}</span>
+                                        <span class="text-warning-emphasis"><i class="fas fa-certificate me-1"></i>${eco.loaiOng}</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-2" style="font-size: 0.7rem;">Chọn</span>
+                            </button>
+                        `;
+                    }).join('');
+                    dropdown.classList.remove('d-none');
+                }, 250);
+            }
+
+            // Khi click chọn một địa điểm trong danh sách gợi ý
+            function selectLocationSuggestion(name, lat, lng) {
+                const addrInput = document.getElementById('diaChiChiTiet');
+                // Nếu người dùng có gõ số nhà ban đầu, giữ lại số nhà phía trước
+                const currentVal = addrInput.value.trim();
+                const houseNumMatch = currentVal.match(/^[0-9]+[A-Za-z]?(\/[0-9]+[A-Za-z]?)*/i);
+                if (houseNumMatch && !name.startsWith(houseNumMatch[0])) {
+                    addrInput.value = houseNumMatch[0] + ' ' + name;
+                } else {
+                    addrInput.value = name;
+                }
+
+                document.getElementById('diaChiSuggestionsDropdown').classList.add('d-none');
+                capNhatBanDoAdmin(lat, lng, true, 15);
+                xuLyToaDoThucTe(lat, lng, false);
+            }
+
+            // Nút bấm Tìm Vị Trí (Hỗ trợ định vị đa tầng từ số nhà, đường đến xã, huyện)
+            async function timKiemDiaDiemAdmin() {
+                const diaChi = document.getElementById('diaChiChiTiet').value.trim();
+                if (!diaChi) {
+                    alert('Vui lòng nhập địa chỉ, tên đường, xã hoặc huyện để tìm kiếm!');
+                    document.getElementById('diaChiChiTiet').focus();
+                    return;
+                }
+
+                document.getElementById('diaChiSuggestionsDropdown').classList.add('d-none');
+
+                const btn = document.getElementById('btnTimDiaDiem');
+                const oldBtnText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang tìm...';
+                btn.disabled = true;
+
+                const result = await findLocationCascade(diaChi);
+
+                btn.innerHTML = oldBtnText;
+                btn.disabled = false;
+
+                if (result && result.lat && result.lng) {
+                    // Cập nhật bản đồ và ghim vị trí chính xác
+                    capNhatBanDoAdmin(result.lat, result.lng, true, 15);
+                    // Giữ nguyên địa chỉ chi tiết số nhà người dùng đã gõ, tự động điền hoa, ong, khí hậu
+                    xuLyToaDoThucTe(result.lat, result.lng, false);
+
+                    const statusEl = document.getElementById('adminMapCoordStatus');
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Đã định vị: ${result.lat.toFixed(4)}, ${result.lng.toFixed(4)}`;
+                    }
+                } else {
+                    alert('Không tìm thấy tọa độ tự động cho địa chỉ này. Bạn hãy bấm trực tiếp lên bản đồ bên dưới để ghim vị trí hoặc chọn gợi ý khi gõ!');
+                }
+            }
+
+// ================= SỰ KIỆN KHỞI TẠO VÀ GẮN LISTENER =================
+            document.addEventListener('DOMContentLoaded', () => {
+                const modalEl = document.getElementById('modalThemDiaDiem');
+                if (modalEl) {
+                    modalEl.addEventListener('shown.bs.modal', () => {
+                        initAdminPickMap();
+                        setTimeout(() => {
+                            if (adminPickMap) adminPickMap.invalidateSize();
+                        }, 250);
+                    });
+                }
+
+                // Gắn sự kiện gõ địa chỉ để hiển thị gợi ý (Autocomplete)
+                const addrInput = document.getElementById('diaChiChiTiet');
+                const dropdown = document.getElementById('diaChiSuggestionsDropdown');
+                if (addrInput) {
+                    addrInput.addEventListener('input', handleAddressInputAutocomplete);
+                    addrInput.addEventListener('focus', (e) => {
+                        if (addrInput.value.trim().length > 0) {
+                            handleAddressInputAutocomplete(e);
+                        }
+                    });
+                }
+
+                // Click chọn item trong gợi ý
+                document.addEventListener('click', (e) => {
+                    const item = e.target.closest('.suggestion-loc-item');
+                    if (item) {
+                        const name = item.dataset.name;
+                        const lat = parseFloat(item.dataset.lat);
+                        const lng = parseFloat(item.dataset.lng);
+                        selectLocationSuggestion(name, lat, lng);
+                        return;
+                    }
+
+                    // Click ngoài dropdown thì ẩn dropdown
+                    if (dropdown && !dropdown.contains(e.target) && e.target !== addrInput) {
+                        dropdown.classList.add('d-none');
+                    }
+                });
+
+                // Phím Escape để đóng dropdown gợi ý
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && dropdown) {
+                        dropdown.classList.add('d-none');
+                    }
+                });
+
+                // Hỗ trợ bấm chip để gán giá trị nhanh cho Loài hoa / Loài ong
+                document.addEventListener('click', (e) => {
+                    const chip = e.target.closest('.eco-chip');
+                    if (chip) {
+                        const targetId = chip.dataset.input;
+                        const val = chip.dataset.val;
+                        const input = document.getElementById(targetId);
+                        if (input) {
+                            input.value = val;
+                            input.focus();
+                        }
+                    }
+                });
+
+                // Xử lý chọn ảnh file từ máy tính
+                const fileInput = document.getElementById('adminImgFile');
+                if (fileInput) {
+                    fileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (re) => {
+                            document.getElementById('adminImgPreview').src = re.target.result;
+                            document.getElementById('hinhAnh').value = re.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+
+            // Hàm xem bản đồ Google Maps
+            function xemBanDo(lat, lng, ten) {
+                if (!lat || !lng) {
+                    alert('Địa điểm này chưa có tọa độ GPS hợp lệ!');
+                    return;
+                }
+                window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+            }
+
+            // Hàm Duyệt / Từ chối
+            async function xulyDiaDiem(id, action) {
+                let lyDoTuChoi = '';
+                if (action === 'duyet') {
+                    if (!confirm(`Xác nhận PHÊ DUYỆT địa điểm ID: ${id}?`)) return;
+                } else if (action === 'tuchoi') {
+                    lyDoTuChoi = prompt(`Vui lòng nhập lý do TỪ CHỐI địa điểm ID: ${id} để báo lại cho chủ đất:`);
+                    if (lyDoTuChoi === null || lyDoTuChoi.trim() === '') {
+                        alert("Bạn cần phải nhập lý do từ chối để chủ đất biết!");
+                        return;
+                    }
+                }
+
+                const apiUrl = action === 'duyet' ? '/api/dia-diem/duyet' : '/api/dia-diem/tu-choi';
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: id, lyDo: lyDoTuChoi })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                } catch (error) {
+                    alert("Không thể kết nối đến Server!");
+                }
+            }
+
+            // Hàm Xóa Địa Điểm
+            async function xoaDiaDiem(id) {
+                if (!confirm(`CẢNH BÁO: Xác nhận XÓA VĨNH VIỄN địa điểm ID: ${id} khỏi hệ thống?`)) return;
+
+                try {
+                    const response = await fetch('/api/dia-diem/xoa', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: id })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (error) {
+                    alert("Không thể kết nối đến Server!");
+                }
+            }
+
+            // Hàm Thêm Mới Địa Điểm
+            async function submitThemDiaDiem() {
+                const data = {
+                    maChuDat: document.getElementById('maChuDat').value,
+                    tenDiaDiem: document.getElementById('tenDiaDiem').value,
+                    dienTich: document.getElementById('dienTich').value,
+                    sucChuaToiDa: document.getElementById('sucChuaToiDa').value,
+                    viDo: document.getElementById('viDo').value,
+                    kinhDo: document.getElementById('kinhDo').value,
+                    diaChiChiTiet: document.getElementById('diaChiChiTiet').value,
+                    thongTinPhapLy: document.getElementById('thongTinPhapLy').value,
+                    loaiHoa: document.getElementById('loaiHoa').value,
+                    loaiOngPhuHop: document.getElementById('loaiOngPhuHop').value,
+                    khiHau: document.getElementById('khiHau').value,
+                    giaThueThang: document.getElementById('giaThueThang').value,
+                    hinhAnh: document.getElementById('hinhAnh').value
+                };
+
+                if (!data.maChuDat || !data.tenDiaDiem || !data.dienTich || !data.sucChuaToiDa || !data.viDo || !data.kinhDo) {
+                    alert("Vui lòng điền đầy đủ các trường bắt buộc: Chủ đất, Tên địa điểm, Diện tích, Sức chứa, Vĩ độ và Kinh độ!");
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/them-dia-diem', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert(result.message);
+                        window.location.reload();
+                    } else {
+                        alert('Lỗi: ' + result.message);
+                    }
+                } catch (error) {
+                    alert('Không thể kết nối đến máy chủ.');
+                }
+            }
+</script>
+</body>
+
+</html>

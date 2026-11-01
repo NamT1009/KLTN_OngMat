@@ -1,0 +1,447 @@
+<!-- Google Fonts & Global Typography for Admin -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    /* =========================================================
+       GLOBAL ADMIN DESIGN SYSTEM & SIDEBAR OVERRIDES
+       ========================================================= */
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        background-color: #f8fafc !important;
+        color: #1e293b;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Modern Scrollbars */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(15, 23, 42, 0.05);
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Modern Dark Obsidian Sidebar */
+    aside.sidebar {
+        width: 270px !important;
+        height: 100vh !important;
+        background: #0b0f19 !important;
+        background: linear-gradient(180deg, #0b0f19 0%, #111827 100%) !important;
+        color: #e2e8f0 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 1040 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        transition: all 0.3s ease;
+    }
+
+    .main-content {
+        margin-left: 270px !important;
+    }
+
+    aside.sidebar::-webkit-scrollbar {
+        width: 4px;
+    }
+    aside.sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+    }
+
+    /* Brand Header with Honeybee Logo */
+    .sidebar-brand-custom {
+        padding: 22px 20px 20px 20px;
+        background: rgba(15, 23, 42, 0.7);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none !important;
+    }
+
+    .brand-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.38));
+        border: 1px solid rgba(245, 158, 11, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+        flex-shrink: 0;
+        padding: 5px;
+        transition: transform 0.25s ease;
+    }
+
+    .sidebar-brand-custom:hover .brand-icon-box {
+        transform: scale(1.06);
+    }
+
+    .brand-text-box h5 {
+        font-size: 1rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: 0.6px;
+        background: linear-gradient(135deg, #fef08a 0%, #fbbf24 60%, #f59e0b 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text-box .brand-tagline {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-top: 2px;
+    }
+
+    /* Menu Navigation List & Spacious Layout */
+    .sidebar-menu-nav {
+        list-style: none !important;
+        padding: 16px 14px 28px 14px !important;
+        margin: 0 !important;
+        flex-grow: 1;
+    }
+
+    /* Section Category Headers */
+    .menu-header-label {
+        padding: 22px 14px 10px 14px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+    }
+
+    .menu-header-label:first-of-type {
+        padding-top: 4px;
+    }
+
+    /* Spacious gaps between menu items */
+    .sidebar-menu-nav li {
+        list-style: none !important;
+        margin-bottom: 8px !important; /* Khoảng cách hợp lý, thoáng đãng giữa các nút */
+    }
+
+    .sidebar-menu-nav a,
+    .sidebar-menu-nav .nav-link {
+        display: flex !important;
+        align-items: center !important;
+        padding: 11px 16px !important; /* Tăng độ dày nút bấm giúp dễ nhìn, dễ click */
+        color: #94a3b8 !important;
+        text-decoration: none !important;
+        border-radius: 12px !important;
+        font-size: 0.88rem !important;
+        font-weight: 500 !important;
+        transition: all 0.22s ease !important;
+        border-left: none !important;
+        position: relative;
+    }
+
+    .sidebar-menu-nav a .nav-icon-wrapper,
+    .sidebar-menu-nav .nav-link .nav-icon-wrapper {
+        width: 26px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-right: 14px !important; /* Khoảng cách rộng rãi giữa icon và text */
+        font-size: 1rem !important;
+        color: #64748b;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .sidebar-menu-nav a:hover,
+    .sidebar-menu-nav .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.07) !important;
+        color: #f8fafc !important;
+        transform: translateX(4px);
+    }
+
+    .sidebar-menu-nav a:hover .nav-icon-wrapper,
+    .sidebar-menu-nav .nav-link:hover .nav-icon-wrapper {
+        color: #fbbf24;
+    }
+
+    /* Active Link - Glowing Amber Capsule */
+    .sidebar-menu-nav a.active,
+    .sidebar-menu-nav .nav-link.active {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%) !important;
+        color: #0b0f19 !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 18px rgba(245, 158, 11, 0.38) !important;
+    }
+
+    .sidebar-menu-nav a.active .nav-icon-wrapper,
+    .sidebar-menu-nav .nav-link.active .nav-icon-wrapper {
+        color: #0b0f19 !important;
+    }
+
+    .sidebar-menu-nav a.active svg path,
+    .sidebar-menu-nav .nav-link.active svg path {
+        stroke: #0b0f19 !important;
+    }
+
+    /* Badge Counter */
+    .menu-badge-counter {
+        margin-left: auto;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 20px;
+        background-color: #ef4444;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+
+    /* Sidebar Footer / User Profile */
+    .sidebar-footer-custom {
+        padding: 16px 18px;
+        background: rgba(10, 15, 26, 0.9);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: auto;
+    }
+
+    .user-avatar-mini {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        font-weight: 800;
+        flex-shrink: 0;
+        border: 2px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+    }
+
+    .user-info-mini {
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .user-info-mini .user-name {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.25;
+    }
+
+    .user-info-mini .user-role {
+        font-size: 0.7rem;
+        color: #fbbf24;
+        font-weight: 600;
+        margin-top: 2px;
+    }
+
+    .btn-logout-mini {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .btn-logout-mini:hover {
+        background: #ef4444;
+        color: #fff;
+        box-shadow: 0 0 14px rgba(239, 68, 68, 0.45);
+        transform: translateY(-1px);
+    }
+</style>
+
+<aside class="sidebar">
+    <!-- Brand Header with Honeybee Vector Logo -->
+    <a href="/" class="sidebar-brand-custom">
+        <div class="brand-icon-box">
+            <!-- Vector Logo Con Ong Mật Vàng Cao Cấp -->
+            <svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Tổ ong viền ngoài -->
+                <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="url(#sideHexGrad)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+                <!-- Cánh ong bên trái -->
+                <ellipse cx="20" cy="23" rx="8" ry="14" transform="rotate(-38 20 23)" fill="url(#sideWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                <path d="M16 15 Q20 23 24 28" stroke="#fef08a" stroke-width="0.8" opacity="0.6"/>
+                <!-- Cánh ong bên phải -->
+                <ellipse cx="44" cy="23" rx="8" ry="14" transform="rotate(38 44 23)" fill="url(#sideWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                <path d="M48 15 Q44 23 40 28" stroke="#fef08a" stroke-width="0.8" opacity="0.6"/>
+                <!-- Thân ong mật -->
+                <ellipse cx="32" cy="36" rx="11" ry="16" fill="url(#sideBodyGrad)"/>
+                <!-- Sọc đen bụng ong -->
+                <path d="M22.5 30 Q32 32.5 41.5 30 L41 33.5 Q32 36 23 33.5 Z" fill="#0f172a"/>
+                <path d="M21.5 37 Q32 40 42.5 37 L41.5 40.5 Q32 43.5 22.5 40.5 Z" fill="#0f172a"/>
+                <path d="M24 44.5 Q32 47 40 44.5 L38.5 48 Q32 50.5 25.5 48 Z" fill="#0f172a"/>
+                <!-- Đuôi kim chích -->
+                <path d="M30.5 51.5 L32 56 L33.5 51.5 Z" fill="#0f172a"/>
+                <!-- Đầu ong -->
+                <circle cx="32" cy="22" r="7.5" fill="#f59e0b"/>
+                <ellipse cx="29" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                <circle cx="28.5" cy="20.2" r="0.6" fill="#ffffff"/>
+                <ellipse cx="35" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                <circle cx="34.5" cy="20.2" r="0.6" fill="#ffffff"/>
+                <!-- Râu ong -->
+                <path d="M29 16 Q26 9 20 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <circle cx="20" cy="11" r="1.8" fill="#fbbf24"/>
+                <path d="M35 16 Q38 9 44 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <circle cx="44" cy="11" r="1.8" fill="#fbbf24"/>
+                <defs>
+                    <linearGradient id="sideHexGrad" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#b45309" stop-opacity="0.4"/>
+                        <stop offset="1" stop-color="#f59e0b" stop-opacity="0.1"/>
+                    </linearGradient>
+                    <linearGradient id="sideBodyGrad" x1="21" y1="20" x2="43" y2="52" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#fde047"/>
+                        <stop offset="0.5" stop-color="#f59e0b"/>
+                        <stop offset="1" stop-color="#d97706"/>
+                    </linearGradient>
+                    <linearGradient id="sideWingGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop stop-color="#ffffff" stop-opacity="0.95"/>
+                        <stop offset="0.8" stop-color="#fef9c3" stop-opacity="0.75"/>
+                        <stop offset="1" stop-color="#fde047" stop-opacity="0.5"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="brand-text-box">
+            <h5>TRUY VẾT ONG MẬT</h5>
+            <div class="brand-tagline">Quản Trị Hệ Thống</div>
+        </div>
+    </a>
+
+    <!-- Menu Links -->
+    <ul class="sidebar-menu-nav">
+        <!-- 1. TỔNG QUAN -->
+        <div class="menu-header-label">Tổng Quan</div>
+        <li>
+            <a href="/" class="<%= typeof path !== 'undefined' && path === '/' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-chart-line"></i></span>
+                <span>Dashboard Thống Kê</span>
+            </a>
+        </li>
+
+        <!-- 2. NGHIỆP VỤ CHÍNH -->
+        <div class="menu-header-label">Nghiệp Vụ Chính</div>
+        <li>
+            <a href="/kiem-duyet" class="<%= typeof path !== 'undefined' && path === '/kiem-duyet' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-map-marked-alt"></i></span>
+                <span>Kiểm Duyệt Địa Điểm</span>
+                <% if (typeof soThongBao !== 'undefined' && soThongBao > 0) { %>
+                    <span class="menu-badge-counter"><%= soThongBao %></span>
+                <% } %>
+            </a>
+        </li>
+        <li>
+            <a href="/danh-sach-bai-dang" class="<%= typeof path !== 'undefined' && path === '/danh-sach-bai-dang' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-store"></i></span>
+                <span>Thị Trường Cho Thuê</span>
+            </a>
+        </li>
+        <li>
+            <a href="/danh-muc-hoa" class="<%= typeof path !== 'undefined' && path === '/danh-muc-hoa' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-seedling"></i></span>
+                <span>Quản Lý Danh Mục Hoa</span>
+            </a>
+        </li>
+        <li>
+            <a href="/giong-ong" class="<%= typeof path !== 'undefined' && path === '/giong-ong' ? 'active' : '' %>">
+                <!-- Icon Ong Mật Mini dành cho Giống Ong -->
+                <span class="nav-icon-wrapper">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <ellipse cx="7.5" cy="8" rx="3" ry="5.5" transform="rotate(-32 7.5 8)" fill="#fef08a" opacity="0.85"/>
+                        <ellipse cx="16.5" cy="8" rx="3" ry="5.5" transform="rotate(32 16.5 8)" fill="#fef08a" opacity="0.85"/>
+                        <ellipse cx="12" cy="13.5" rx="4.5" ry="6.5" fill="#f59e0b"/>
+                        <path d="M8.5 11 Q12 12.5 15.5 11" stroke="#0f172a" stroke-width="1.4"/>
+                        <path d="M8 14.5 Q12 16 16 14.5" stroke="#0f172a" stroke-width="1.4"/>
+                        <circle cx="12" cy="7.5" r="3" fill="#f59e0b"/>
+                        <path d="M10.5 5 Q9 2 7 3" stroke="#d97706" stroke-width="1.2" stroke-linecap="round"/>
+                        <path d="M13.5 5 Q15 2 17 3" stroke="#d97706" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span>Quản Lý Giống Ong</span>
+            </a>
+        </li>
+        <li>
+            <a href="/nguoi-nuoi-ong" class="<%= typeof path !== 'undefined' && path === '/nguoi-nuoi-ong' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-archive"></i></span>
+                <span>Nghiệp Vụ Nuôi Ong</span>
+            </a>
+        </li>
+
+        <!-- 3. HỆ THỐNG & DỮ LIỆU -->
+        <div class="menu-header-label">Hệ Thống & Dữ Liệu</div>
+        <li>
+            <a href="/nguoi-dung" class="<%= typeof path !== 'undefined' && path === '/nguoi-dung' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-users-cog"></i></span>
+                <span>Quản Lý Người Dùng</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ban-do" class="<%= typeof path !== 'undefined' && path === '/ban-do' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-globe-asia"></i></span>
+                <span>Bản Đồ Điểm Đặt Ong</span>
+            </a>
+        </li>
+        <li>
+            <a href="/ho-tro" class="<%= typeof path !== 'undefined' && path === '/ho-tro' ? 'active' : '' %>">
+                <span class="nav-icon-wrapper"><i class="fas fa-comments"></i></span>
+                <span>Hỗ Trợ & Nhắn Tin</span>
+            </a>
+        </li>
+        <li>
+            <a href="/tra-cuu" target="_blank">
+                <span class="nav-icon-wrapper"><i class="fas fa-qrcode"></i></span>
+                <span>Tra Cứu QR Khách</span>
+                <i class="fas fa-external-link-alt ms-auto" style="font-size: 0.7rem; opacity: 0.5;"></i>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Footer Mini Profile -->
+    <div class="sidebar-footer-custom">
+        <div class="user-avatar-mini">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="user-info-mini">
+            <div class="user-name">
+                <%= (typeof currentUser !== 'undefined' && currentUser && currentUser.hoTen) ? currentUser.hoTen : 'Administrator' %>
+            </div>
+            <div class="user-role">Quản trị viên</div>
+        </div>
+        <a href="/logout" class="btn-logout-mini" title="Đăng xuất khỏi hệ thống">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </div>
+</aside>

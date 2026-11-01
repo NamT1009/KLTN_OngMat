@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "814398766156",
+    "project_id": "kltn-ongmat",
+    "storage_bucket": "kltn-ongmat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814398766156:android:1254dea40e896d32a988e9",
+        "android_client_info": {
+          "package_name": "com.example.mobile_ongmat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBk57KDxFkD9odtRrWZYjf0HBrUWq6P-Gk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

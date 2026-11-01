@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Bản Đồ Điểm Đặt Ong | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tải thư viện Bản đồ Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #212529;
+            text-align: center;
+            color: #ffc107;
+            border-bottom: 1px solid #4b545c;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 20px;
+            color: #c2c7d0;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: #495057;
+            color: #fff;
+            border-left-color: #ffc107;
+        }
+
+        .sidebar-menu li a i {
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* CSS cho khung bản đồ */
+        #map-container {
+            flex-grow: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #fff;
+            height: 75vh;
+            min-height: 600px;
+        }
+
+        /* Chỉnh CSS cho popup thông tin trên bản đồ */
+        .custom-popup .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+        }
+
+        .custom-popup .popup-title {
+            font-weight: bold;
+            color: #d97706;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .custom-popup .popup-info {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <%- include('partials/topbar') %>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h3 class="text-secondary fw-bold">Bản Đồ Phân Bố Vườn Ong (GIS)</h3>
+                        <p class="text-muted mb-0">Hiển thị trực quan các tọa độ vườn hoa đã được kiểm duyệt an toàn.
+                        </p>
+                    </div>
+                    <div class="badge bg-warning text-dark p-2 fs-6 shadow-sm">
+                        <i class="fas fa-map-marker-alt text-danger me-1"></i> Tổng số: <span id="tongSoDiem">0</span>
+                        điểm
+                    </div>
+                </div>
+
+                <!-- Khung chứa bản đồ -->
+                <div id="map-container"></div>
+        </div>
+
+        <script id="diaDiemData" type="application/json">
+        <%- danhSachDiaDiem %>
+    </script>
+        <script id="danOngData" type="application/json">
+        <%- typeof danhSachDanOng !== 'undefined' ? danhSachDanOng : '[]' %>
+    </script>
+
+        <script>
+            // Đọc chuỗi JSON từ thẻ ẩn ở trên và parse sang mảng Javascript
+            const rawData = document.getElementById('diaDiemData').textContent;
+            const danhSachDiaDiem = JSON.parse(rawData);
+            const danhSachDanOng = JSON.parse(document.getElementById('danOngData').textContent);
+            const markers = [...danhSachDiaDiem, ...danhSachDanOng];
+
+            document.getElementById('tongSoDiem').innerText = markers.length;
+
+            // Khởi tạo bản đồ. Tâm mặc định ở Việt Nam (Vĩ độ: 14.0583, Kinh độ: 108.2772), mức zoom: 6
+            const map = L.map('map-container').setView([14.0583, 108.2772], 6);
+
+            // Nạp lớp bản đồ từ OpenStreetMap (Đã fix lỗi bỏ biến {s})
+            L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                attribution: '© Google Maps contributors | Hệ Thống Ong Mật',
+                maxZoom: 20,
+            }).addTo(map);
+
+            // Custom Icon con ong
+            const beeIcon = L.divIcon({
+                className: 'beehive-svg-marker',
+                html: `
+        <div style="filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35)); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
+            <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Vòng tổ ong -->
+                <ellipse cx="32" cy="18" rx="14" ry="6" fill="#FBBF24" stroke="#D97706" stroke-width="2.5"/>
+                <ellipse cx="32" cy="26" rx="19" ry="7" fill="#F59E0B" stroke="#D97706" stroke-width="2.5"/>
+                <ellipse cx="32" cy="35" rx="22" ry="8" fill="#FBBF24" stroke="#D97706" stroke-width="2.5"/>
+                <ellipse cx="32" cy="44" rx="18" ry="7" fill="#F59E0B" stroke="#D97706" stroke-width="2.5"/>
+                <ellipse cx="32" cy="51" rx="13" ry="5" fill="#D97706" stroke="#B45309" stroke-width="2"/>
+                <!-- Cửa tổ ong -->
+                <ellipse cx="32" cy="37" rx="5" ry="6" fill="#78350F"/>
+                <!-- Giọt mật nhỏ trang trí -->
+                <circle cx="43" cy="22" r="3" fill="#FEF08A"/>
+            </svg>
+        </div>
+    `,
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40]
+            });
+
+            // Lặp qua mảng dữ liệu và gắn Marker lên bản đồ
+            danhSachDiaDiem.forEach(diem => {
+                if (diem.viDo && diem.kinhDo) {
+                    const popupContent = `
+                    <div class="custom-popup">
+                        <div class="popup-title"><i class="fas fa-leaf me-1"></i> ${diem.tenDiaDiem}</div>
+                        <p class="popup-info">
+                            <i class="fas fa-user text-secondary me-2"></i><b>Chủ đất:</b> ${diem.tenChuDat}<br>
+                            <i class="fas fa-vector-square text-secondary me-2"></i><b>Diện tích:</b> ${diem.dienTich} m²<br>
+                            <i class="fas fa-archive text-secondary me-2"></i><b>Sức chứa:</b> Max ${diem.sucChuaToiDa} đàn<br>
+                            <i class="fas fa-map-pin text-secondary me-2"></i><b>Địa chỉ:</b> ${diem.diaChiChiTiet}
+                        </p>
+                    </div>
+                `;
+
+                    const marker = L.marker([diem.viDo, diem.kinhDo], { icon: beeIcon }).addTo(map);
+                    marker.bindPopup(popupContent);
+                }
+            });
+
+            danhSachDanOng.forEach(dan => {
+                if (dan.viDo && dan.kinhDo) {
+                    const popupContent = `
+                    <div class="custom-popup">
+                        <div class="popup-title"><i class="fas fa-hive me-1"></i> ${dan.tenDanOng}</div>
+                        <p class="popup-info">
+                            <b>Mã đàn:</b> ${dan.maDanOng}<br>
+                            <b>Người nuôi:</b> ${dan.tenNguoiNuoi || 'Chưa cập nhật'}<br>
+                            <b>Số thùng:</b> ${dan.soThung || 0}<br>
+                            <b>Vị trí:</b> ${dan.viTri || 'Chưa cập nhật'}<br>
+                            <b>Tình trạng:</b> ${dan.tinhTrang || 'Chưa cập nhật'}
+                        </p>
+                    </div>`;
+                    L.marker([dan.viDo, dan.kinhDo], { icon: beeIcon }).addTo(map).bindPopup(popupContent);
+                }
+            });
+
+            // Tự động căn chỉnh khung hình
+            if (markers.length > 0) {
+                const bounds = markers.filter(d => d.viDo && d.kinhDo).map(d => [d.viDo, d.kinhDo]);
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+
+            // Ép bản đồ tải lại kích thước sau 0.5s để chống lỗi xám nền do Flexbox
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 500);
+        </script>
+</body>
+
+</html>

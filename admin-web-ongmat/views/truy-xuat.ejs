@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truy Xuất Nguồn Gốc Mật Ong</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; padding-bottom: 30px; }
+        .header-img { width: 100%; height: 250px; object-fit: cover; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .info-card { background: #fff; border-radius: 15px; padding: 20px; margin-top: -40px; position: relative; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .product-item { background: #fffaf0; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- Ảnh bìa vườn -->
+    <img src="<%= (diaDiem.hinhAnh && diaDiem.hinhAnh.trim()) ? diaDiem.hinhAnh : '/images/default-garden.svg' %>" alt="Vườn" class="header-img" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+
+    <div class="container">
+        <!-- Thông tin địa điểm -->
+        <div class="info-card mb-4">
+            <div class="text-center mb-3">
+                <span class="badge bg-success mb-2"><i class="fas fa-check-circle"></i> Đã chứng nhận an toàn</span>
+                <h4 class="fw-bold text-dark"><%= diaDiem.tenDiaDiem %></h4>
+            </div>
+            <hr>
+            <p class="mb-2"><i class="fas fa-user text-muted me-2"></i> <strong>Chủ vườn:</strong> <%= diaDiem.tenChuDat %></p>
+            <p class="mb-2"><i class="fas fa-phone-alt text-muted me-2"></i> <strong>Liên hệ:</strong> <%= diaDiem.soDienThoai %></p>
+            <p class="mb-0"><i class="fas fa-map-marker-alt text-danger me-2"></i> <strong>Địa chỉ:</strong> <%= diaDiem.diaChiChiTiet %></p>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <h5 class="fw-bold mb-3"><i class="fas fa-archive text-warning me-2"></i> Sản Phẩm Khai Thác</h5>
+        
+        <% if (danhSachSanPham && danhSachSanPham.length > 0) { %>
+            <% danhSachSanPham.forEach(sp => { %>
+                <div class="product-item shadow-sm">
+                    <h6 class="fw-bold text-dark mb-2"><i class="fas fa-tint text-warning me-1"></i> Sản phẩm từ: <%= sp.tenLoaiOng %></h6>
+                    <p class="mb-0 text-muted small"><strong>Phân loại mặt hàng:</strong> <%= sp.sanPhamChuLuc %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="alert alert-secondary text-center">
+                Hiện tại vườn chưa có ong khai thác mật.
+            </div>
+        <% } %>
+    </div>
+
+</body>
+</html>

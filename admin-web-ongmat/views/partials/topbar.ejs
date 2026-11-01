@@ -1,0 +1,304 @@
+<style>
+    /* =========================================================
+       MODERN TOPBAR HEADER STYLES
+       ========================================================= */
+    .topbar-container-custom {
+        position: relative !important;
+        z-index: 1050 !important;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(226, 232, 240, 0.85);
+        border-radius: 16px;
+        padding: 12px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Modern Pill Search */
+    .search-wrapper-custom {
+        position: relative;
+        width: 360px;
+        max-width: 100%;
+    }
+
+    .search-input-custom {
+        width: 100%;
+        background-color: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 30px;
+        padding: 10px 42px 10px 40px;
+        font-size: 0.86rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.25s ease;
+    }
+
+    .search-input-custom::placeholder {
+        color: #94a3b8;
+        font-weight: 400;
+    }
+
+    .search-input-custom:focus {
+        outline: none;
+        background-color: #ffffff;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+    }
+
+    .search-icon-left {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
+    .search-btn-submit {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #f59e0b;
+        border: none;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .search-btn-submit:hover {
+        background: #d97706;
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    /* Right Action Area */
+    .topbar-actions-area {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        z-index: 1055;
+    }
+
+    .topbar-actions-area .dropdown {
+        position: relative;
+        z-index: 1060;
+    }
+
+    .topbar-actions-area .dropdown-menu {
+        z-index: 1070 !important;
+    }
+
+    .topbar-btn-quick {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        color: #475569;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .topbar-btn-quick:hover {
+        background-color: #f1f5f9;
+        color: #0f172a;
+        border-color: #cbd5e1;
+    }
+
+    /* Notification Bell */
+    .notification-btn-custom {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .notification-btn-custom:hover {
+        background-color: #fef3c7;
+        color: #d97706;
+        border-color: #fde68a;
+    }
+
+    .notif-badge-pill {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background-color: #ef4444;
+        color: #fff;
+        font-size: 0.65rem;
+        font-weight: 700;
+        min-width: 18px;
+        height: 18px;
+        line-height: 18px;
+        text-align: center;
+        border-radius: 20px;
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    }
+
+    .pulse-ring-indicator {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 8px;
+        height: 8px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        animation: pulse-ring 2s infinite;
+    }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* User Profile Pill Dropdown */
+    .user-profile-chip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 12px 5px 6px;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .user-profile-chip:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+
+    .user-avatar-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 800;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .user-name-text {
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+
+    .user-badge-role {
+        font-size: 0.68rem;
+        background-color: #fef3c7;
+        color: #92400e;
+        padding: 1px 7px;
+        border-radius: 20px;
+        font-weight: 600;
+        border: 1px solid #fde68a;
+    }
+</style>
+
+<!-- Khung Header Topbar Hiện Đại -->
+<div class="topbar-container-custom">
+    
+    <!-- 1. Form Tìm Kiếm Nhanh -->
+    <form action="/tim-kiem" method="GET" class="search-wrapper-custom">
+        <i class="fas fa-search search-icon-left"></i>
+        <input 
+            type="text" 
+            name="q" 
+            class="search-input-custom" 
+            placeholder="Tìm kiếm nhanh người dùng, địa điểm..." 
+            required
+            autocomplete="off"
+        >
+        <button type="submit" class="search-btn-submit" title="Tìm kiếm">
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </form>
+
+    <!-- 2. Khu vực Tiện ích và Tài khoản Admin -->
+    <div class="topbar-actions-area">
+        <!-- Phím tắt nhanh: Bản đồ GIS -->
+        <a href="/ban-do" class="topbar-btn-quick d-none d-md-inline-flex" title="Xem bản đồ điểm đặt ong trên GIS">
+            <i class="fas fa-map-marked-alt text-warning"></i>
+            <span>Bản đồ GIS</span>
+        </a>
+
+        <!-- Cổng nghiệp vụ Portal -->
+        <a href="/portal" class="topbar-btn-quick d-none d-lg-inline-flex" title="Xem cổng thao tác nghiệp vụ">
+            <i class="fas fa-layer-group text-primary"></i>
+            <span>Portal Nghiệp vụ</span>
+        </a>
+
+        <!-- Chuông thông báo (Chuyển sang trang Kiểm duyệt) -->
+        <a href="/kiem-duyet" class="notification-btn-custom" title="Xem yêu cầu kiểm duyệt địa điểm">
+            <i class="fas fa-bell"></i>
+            <% if (typeof soThongBao !== 'undefined' && soThongBao > 0) { %>
+                <span class="pulse-ring-indicator"></span>
+                <span class="notif-badge-pill"><%= soThongBao %></span>
+            <% } %>
+        </a>
+
+        <!-- Dropdown / Profile Chip -->
+        <div class="dropdown">
+            <div class="user-profile-chip dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-avatar-circle">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="d-none d-sm-block text-start">
+                    <div class="user-name-text">
+                        <%= (typeof currentUser !== 'undefined' && currentUser && currentUser.hoTen) ? currentUser.hoTen : 'Administrator' %>
+                    </div>
+                </div>
+                <span class="user-badge-role d-none d-sm-inline-block">Admin</span>
+            </div>
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2" style="min-width: 210px;">
+                <li class="px-3 py-2 border-bottom mb-1">
+                    <div class="fw-bold text-dark small"><%= (typeof currentUser !== 'undefined' && currentUser && currentUser.hoTen) ? currentUser.hoTen : 'Administrator' %></div>
+                    <div class="text-muted" style="font-size: 0.75rem;"><%= (typeof currentUser !== 'undefined' && currentUser && currentUser.email) ? currentUser.email : 'admin@ongmat.vn' %></div>
+                </li>
+                <li><a class="dropdown-item py-2 small" href="/"><i class="fas fa-chart-line text-warning me-2"></i> Dashboard Thống Kê</a></li>
+                <li><a class="dropdown-item py-2 small" href="/kiem-duyet"><i class="fas fa-map-marked-alt text-danger me-2"></i> Kiểm Duyệt Địa Điểm</a></li>
+                <li><a class="dropdown-item py-2 small" href="/ban-do"><i class="fas fa-globe-asia text-info me-2"></i> Bản Đồ Điểm Đặt Ong</a></li>
+                <li><a class="dropdown-item py-2 small" href="/tra-cuu" target="_blank"><i class="fas fa-qrcode text-success me-2"></i> Tra Cứu Truy Xuất QR</a></li>
+                <li><hr class="dropdown-divider my-1"></li>
+                <li><a class="dropdown-item py-2 small text-danger fw-semibold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Đăng Xuất</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Quản Trị | Hệ Thống Truy Vết Ong Mật</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & FontAwesome 6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-canvas: #f8fafc;
+            --primary-amber: #f59e0b;
+            --primary-amber-dark: #d97706;
+            --text-dark: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-subtle: #e2e8f0;
+            --card-radius: 18px;
+        }
+
+        body { 
+            background-color: var(--bg-canvas); 
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-content { 
+            margin-left: 260px; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 100vh; 
+        }
+
+        .content-wrapper { 
+            padding: 24px 32px 48px 32px; 
+            flex-grow: 1; 
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: var(--card-radius);
+            padding: 24px 28px;
+            color: #fff;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .welcome-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .welcome-subtitle {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            margin-bottom: 0;
+        }
+
+        .welcome-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-banner-action {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 0.84rem;
+            font-weight: 600;
+            padding: 9px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-banner-action:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fbbf24;
+            transform: translateY(-2px);
+        }
+
+        /* Modern KPI Cards */
+        .kpi-card { 
+            background: #ffffff; 
+            border-radius: var(--card-radius); 
+            padding: 22px 24px; 
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04);
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.09);
+            border-color: #cbd5e1;
+        }
+
+        .kpi-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .kpi-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .kpi-icon-box { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 14px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-size: 20px; 
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-users { 
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd); 
+            color: #0284c7; 
+        }
+
+        .icon-hives { 
+            background: linear-gradient(135deg, #fef3c7, #fde68a); 
+            color: #d97706; 
+        }
+
+        .icon-alert { 
+            background: linear-gradient(135deg, #fee2e2, #fecaca); 
+            color: #dc2626; 
+        }
+
+        .icon-honey { 
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0); 
+            color: #16a34a; 
+        }
+
+        .kpi-number {
+            font-size: 1.85rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-dark);
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .kpi-subtext {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modern Custom Cards */
+        .card-custom { 
+            background: #ffffff; 
+            border-radius: var(--card-radius); 
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.04); 
+            border: 1px solid var(--border-subtle); 
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header-custom { 
+            background-color: #ffffff; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding: 18px 24px; 
+            font-weight: 700; 
+            font-size: 0.98rem; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-dark);
+        }
+
+        .card-header-custom .badge-title {
+            background-color: #f1f5f9;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.72rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* Activity / Ranking Lists */
+        .list-group-custom .list-group-item {
+            padding: 14px 24px;
+            border-color: #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+
+        .list-group-custom .list-group-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .rank-medal {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .rank-1 { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .rank-2 { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        .rank-3 { background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+
+        .batch-qr-tag {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .batch-qr-tag:hover {
+            background: #16a34a;
+            color: #fff;
+        }
+
+        .status-dot-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Thông Minh -->
+    <%- include('./partials/sidebar') %>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Topbar Thông Minh -->
+        <div style="padding: 24px 32px 0 32px;">
+            <%- include('partials/topbar') %>
+        </div>
+
+        <!-- DASHBOARD WRAPPER -->
+        <div class="content-wrapper">
+            <% const k = stats.kpi; const num = (v) => Number(v || 0).toLocaleString('vi-VN'); %>
+
+            <!-- 1. BANNER CHÀO MỪNG HIỆN ĐẠI -->
+            <div class="welcome-banner">
+                <div>
+                    <h2 class="welcome-title">
+                        Xin chào, <%= (typeof currentUser !== 'undefined' && currentUser && currentUser.hoTen) ? currentUser.hoTen : 'Quản trị viên' %>! 👋
+                    </h2>
+                    <p class="welcome-subtitle">
+                        Bảng điều khiển giám sát chuỗi cung ứng mật ong, đàn ong và vùng nguyên liệu theo thời gian thực.
+                    </p>
+                </div>
+                <div class="welcome-actions">
+                    <a href="/ban-do" class="btn-banner-action">
+                        <i class="fas fa-globe-asia text-warning"></i>
+                        <span>Bản Đồ GIS Điểm Đặt</span>
+                    </a>
+                    <a href="/kiem-duyet" class="btn-banner-action">
+                        <i class="fas fa-map-marked-alt text-danger"></i>
+                        <span>Duyệt Điểm (<%= num(k.diaDiemChoDuyet) %>)</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. HÀNG THỐNG KÊ KPI CHÍNH -->
+            <div class="row g-4 mb-4">
+                <!-- KPI 1: Người dùng -->
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Tổng Người Dùng</span>
+                            <div class="kpi-icon-box icon-users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="kpi-number"><%= num(k.tongNguoiDung) %></div>
+                            <div class="kpi-subtext">
+                                <i class="fas fa-user-check text-info"></i>
+                                <span><%= num(k.soNguoiNuoiOng) %> nuôi ong · <%= num(k.soChuDat) %> chủ đất</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 2: Quy mô đàn & thùng ong -->
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label">Đàn Ong / Thùng Ong</span>
+                            <div class="kpi-icon-box icon-hives">
+                                <i class="fas fa-archive"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="kpi-number"><%= num(k.tongDanOng) %> <span style="font-size: 1.1rem; color: #94a3b8; font-weight: 500;">/ <%= num(k.tongThungOng) %></span></div>
+                            <div class="kpi-subtext">
+                                <i class="fas fa-handshake text-warning"></i>
+                                <span><%= num(k.hopDongHieuLuc) %> hợp đồng thuê đang hiệu lực</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI 3: Địa điểm chờ duyệt -->
+                <div class="col-sm-6 col-xl-3">
+                    <a href="/kiem-duyet" class="text-decoration-none">
+                        <div class="kpi-card" style="border-bottom: 3px solid #ef4444;">
+                            <div class="kpi-card-header">
+                                <span class="kpi-label text-danger">Địa Điểm Chờ Duyệt</span>
+                                <div class="kpi-icon-box icon-alert">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="kpi-number text-danger"><%= num(k.diaDiemChoDuyet) %></div>
+                                <div class="kpi-subtext">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <span><%= num(k.diaDiemDaDuyet) %> / <%= num(k.tongDiaDiem) %> địa điểm đã phê duyệt</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- KPI 4: Tổng sản lượng mật -->
+                <div class="col-sm-6 col-xl-3">
+                    <div class="kpi-card" style="border-bottom: 3px solid #22c55e;">
+                        <div class="kpi-card-header">
+                            <span class="kpi-label text-success">Tổng Sản Lượng Mật</span>
+                            <div class="kpi-icon-box icon-honey">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="kpi-number text-success"><%= num(k.tongSanLuongKg) %> <span style="font-size: 1rem; font-weight: 600;">kg</span></div>
+                            <div class="kpi-subtext">
+                                <i class="fas fa-qrcode text-success"></i>
+                                <span><%= num(k.soLoTruyXuat) %> lô có QR<% if (Number(k.tongSanLuongLit) > 0) { %> · <%= num(k.tongSanLuongLit) %> L<% } %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. HÀNG BIỂU ĐỒ TRỰC QUAN -->
+            <div class="row g-4 mb-4">
+                <!-- Biểu đồ cột: Sản lượng 12 tháng -->
+                <div class="col-lg-8">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-chart-column text-warning"></i>
+                                <span>Sản Lượng Khai Thác 12 Tháng Gần Nhất (kg)</span>
+                            </div>
+                            <span class="badge-title">Chuỗi cung ứng</span>
+                        </div>
+                        <div class="card-body p-4">
+                            <div style="position: relative; height: 320px;">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ tròn: Cơ cấu loại mật -->
+                <div class="col-lg-4">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-chart-pie text-info"></i>
+                                <span>Sản Lượng Theo Loại Mật</span>
+                            </div>
+                            <span class="badge-title">Phân bổ</span>
+                        </div>
+                        <div class="card-body p-4 d-flex align-items-center justify-content-center">
+                            <% if (stats.sanLuongTheoLoaiMat && stats.sanLuongTheoLoaiMat.length) { %>
+                                <div style="position: relative; height: 320px; width: 100%;">
+                                    <canvas id="pieChart"></canvas>
+                                </div>
+                            <% } else { %>
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fas fa-inbox fs-1 mb-2 text-secondary opacity-50"></i>
+                                    <p class="mb-0">Chưa ghi nhận dữ liệu sản lượng loại mật.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. HÀNG DANH SÁCH CHI TIẾT NGHIỆP VỤ -->
+            <div class="row g-4 mb-4">
+                <!-- Cột 1: Tình trạng đàn ong -->
+                <div class="col-lg-4">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-shield-virus text-success"></i>
+                                <span>Tình Trạng Đàn Ong</span>
+                            </div>
+                            <span class="badge-title">Theo dõi</span>
+                        </div>
+                        <ul class="list-group list-group-flush list-group-custom">
+                            <% if (stats.danOngTheoTinhTrang && stats.danOngTheoTinhTrang.length) { %>
+                                <% stats.danOngTheoTinhTrang.forEach(x => { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <span class="status-dot-indicator bg-success"></span>
+                                            <span class="fw-semibold text-secondary"><%= x.tinhTrang %></span>
+                                        </div>
+                                        <span class="badge bg-light text-dark border px-2 py-1 font-monospace">
+                                            <%= x.soDan %> đàn · <%= x.soThung %> thùng
+                                        </span>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item text-muted text-center py-4">Chưa có dữ liệu đàn ong.</li>
+                            <% } %>
+                        </ul>
+                        <div class="mt-auto p-3 bg-light border-top small text-secondary">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="fas fa-calendar-alt text-warning"></i>
+                                <span><strong><%= num(k.lichChamSocChuaXong) %></strong> lịch chăm sóc chưa hoàn thành</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-file-contract text-primary"></i>
+                                <span><strong><%= num(k.yeuCauChoDuyet) %></strong> yêu cầu thuê chờ chủ đất duyệt</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột 2: Top địa điểm sản lượng -->
+                <div class="col-lg-4">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-trophy text-warning"></i>
+                                <span>Địa Điểm Sản Lượng Cao</span>
+                            </div>
+                            <span class="badge-title">Bảng xếp hạng</span>
+                        </div>
+                        <ul class="list-group list-group-flush list-group-custom">
+                            <% if (stats.diaDiemSanLuongCao && stats.diaDiemSanLuongCao.length) { %>
+                                <% stats.diaDiemSanLuongCao.forEach((x, i) => { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <span class="rank-medal rank-<%= i < 3 ? (i + 1) : 2 %>"><%= i + 1 %></span>
+                                            <div>
+                                                <div class="fw-bold text-dark text-truncate" style="max-width: 170px;"><%= x.tenDiaDiem %></div>
+                                                <div class="small text-muted"><i class="fas fa-user-tag me-1"></i><%= x.chuDat %></div>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-warning-subtle text-warning-emphasis fw-bold px-2 py-1">
+                                                <%= num(x.kg) %> kg
+                                            </span>
+                                        </div>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item text-muted text-center py-4">Chưa có dữ liệu địa điểm.</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Cột 3: Lô mật truy xuất gần đây -->
+                <div class="col-lg-4">
+                    <div class="card-custom">
+                        <div class="card-header-custom">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fas fa-qrcode text-success"></i>
+                                <span>Lô Mật Truy Xuất Gần Đây</span>
+                            </div>
+                            <span class="badge-title">Mã QR</span>
+                        </div>
+                        <ul class="list-group list-group-flush list-group-custom">
+                            <% if (stats.loTruyXuatGanDay && stats.loTruyXuatGanDay.length) { %>
+                                <% stats.loTruyXuatGanDay.forEach(x => { %>
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <a href="/truy-xuat-qr?ma=<%= x.maLo %>" target="_blank" class="batch-qr-tag">
+                                                <i class="fas fa-qrcode"></i> #<%= x.maLo %>
+                                            </a>
+                                            <span class="fw-bold text-success small"><%= num(x.kg) %> kg</span>
+                                        </div>
+                                        <div class="fw-semibold text-dark small"><%= x.sanPham %></div>
+                                        <div class="small text-muted" style="font-size: 0.74rem;">
+                                            <i class="fas fa-map-pin me-1 text-danger"></i><%= x.tenDiaDiem %> 
+                                            <% if (x.nguoiNuoiOng) { %> · <i class="fas fa-user me-1"></i><%= x.nguoiNuoiOng %><% } %>
+                                            <% if (x.thoiGian) { %> · <%= x.thoiGian %><% } %>
+                                        </div>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item text-muted text-center py-4">Chưa có lô mật nào.</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart Configuration Script -->
+    <script>
+        const theoThang = <%- JSON.stringify(stats.sanLuongTheoThang || []) %>;
+        const theoLoai = <%- JSON.stringify(stats.sanLuongTheoLoaiMat || []).replace(/</g, '\\u003c') %>;
+
+        // 1. Bar Chart: 12 Tháng
+        const barCanvas = document.getElementById('barChart');
+        if (barCanvas) {
+            const ctx = barCanvas.getContext('2d');
+            const gradientAmber = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientAmber.addColorStop(0, 'rgba(245, 158, 11, 0.85)');
+            gradientAmber.addColorStop(1, 'rgba(245, 158, 11, 0.15)');
+
+            new Chart(barCanvas, {
+                type: 'bar',
+                data: {
+                    labels: theoThang.map(x => x.thang),
+                    datasets: [{
+                        label: 'Sản lượng (kg)',
+                        data: theoThang.map(x => Number(x.kg)),
+                        backgroundColor: gradientAmber,
+                        borderColor: '#f59e0b',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        maxBarThickness: 36
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            titleFont: { size: 13, family: 'Plus Jakarta Sans', weight: '700' },
+                            bodyFont: { size: 12, family: 'Plus Jakarta Sans' },
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Sản lượng: ${Number(context.raw || 0).toLocaleString('vi-VN')} kg`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(226, 232, 240, 0.7)' },
+                            ticks: { font: { family: 'Plus Jakarta Sans' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: 'Plus Jakarta Sans' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Doughnut Chart: Loại Mật
+        const pieCanvas = document.getElementById('pieChart');
+        if (pieCanvas && theoLoai.length) {
+            new Chart(pieCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: theoLoai.map(x => x.loaiMat),
+                    datasets: [{
+                        data: theoLoai.map(x => Number(x.kg)),
+                        backgroundColor: [
+                            '#f59e0b', // Amber
+                            '#10b981', // Emerald
+                            '#3b82f6', // Blue
+                            '#f43f5e', // Rose
+                            '#8b5cf6', // Violet
+                            '#06b6d4', // Cyan
+                            '#84cc16'  // Lime
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 14,
+                                font: { family: 'Plus Jakarta Sans', size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            titleFont: { size: 13, family: 'Plus Jakarta Sans', weight: '700' },
+                            bodyFont: { size: 12, family: 'Plus Jakarta Sans' },
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${Number(context.raw || 0).toLocaleString('vi-VN')} kg`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

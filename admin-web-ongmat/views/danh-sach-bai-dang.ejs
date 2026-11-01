@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh Sách Địa Điểm | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', sans-serif; }
+        /* CSS cho Sidebar */
+        .sidebar { width: 260px; height: 100vh; background-color: #343a40; color: #fff; position: fixed; top: 0; left: 0; z-index: 1000; overflow-y: auto; }
+        .sidebar-brand { padding: 20px; font-size: 1.2rem; font-weight: bold; background: #212529; text-align: center; color: #ffc107; border-bottom: 1px solid #4b545c; }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+        .sidebar-menu li a { display: block; padding: 15px 20px; color: #c2c7d0; text-decoration: none; border-left: 3px solid transparent; transition: 0.3s; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background-color: #495057; color: #fff; border-left-color: #ffc107; }
+        .sidebar-menu li a i { width: 25px; text-align: center; margin-right: 10px; }
+        
+        /* CSS cho Phần nội dung & Thẻ bài đăng */
+        .main-content { margin-left: 260px; min-height: 100vh; padding: 30px; display: flex; flex-direction: column; }
+        .post-card { border: none; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s ease-in-out; }
+        .post-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .post-image { height: 220px; object-fit: cover; width: 100%; background-color: #e9ecef; }
+        .status-badge { position: absolute; top: 15px; right: 15px; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-weight: bold; }
+        .info-row { display: flex; align-items: flex-start; margin-bottom: 8px; font-size: 0.95rem; color: #555; }
+        .info-row i { width: 24px; color: #6c757d; text-align: center; margin-right: 8px; margin-top: 3px; }
+        .rental-info { background-color: #f0fdf4; border-radius: 8px; padding: 12px; margin-top: 15px; border-left: 4px solid #198754; }
+    </style>
+</head>
+<body>
+    <%- include('./partials/sidebar') %>
+
+    <div class="main-content">
+        <%- include('./partials/topbar') %>
+
+        <div class="mb-4">
+            <h3 class="text-secondary fw-bold m-0">Danh Sách Địa Điểm Đang Cho Thuê</h3>
+            <p class="text-muted mt-1">Các vườn đã duyệt, hiển thị thông tin khai thác và sản lượng mật.</p>
+        </div>
+
+        <div class="row g-4">
+            <% if (danhSachBaiDang && danhSachBaiDang.length > 0) { %>
+                <% danhSachBaiDang.forEach(bai => { %>
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card post-card h-100 position-relative">
+                            <!-- Gọi dữ liệu ảnh từ SQL, nếu rỗng thì dùng ảnh mặc định -->
+                            <img src="<%= (bai.hinhAnh && bai.hinhAnh.trim()) ? bai.hinhAnh : '/images/default-garden.svg' %>" class="post-image" alt="<%= bai.tenDiaDiem || 'Hình ảnh vườn' %>" onerror="this.onerror=null; this.src='/images/default-garden.svg';">
+                            
+                            <!-- Nhãn Trạng Thái Chỗ Trống -->
+                            <% if (bai.sucChuaConLai <= 0) { %>
+                                <span class="badge bg-danger status-badge"><i class="fas fa-ban me-1"></i> Đã Hết Chỗ</span>
+                            <% } else if (bai.soDanDaThue > 0) { %>
+                                <span class="badge bg-info text-dark status-badge"><i class="fas fa-layer-group me-1"></i> Còn trống <%= bai.sucChuaConLai %>/<%= bai.sucChuaToiDa %> đàn</span>
+                            <% } else { %>
+                                <span class="badge bg-warning text-dark status-badge"><i class="fas fa-door-open me-1"></i> Đang Trống</span>
+                            <% } %>
+
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold text-primary mb-3"><%= bai.tenDiaDiem %></h5>
+                                
+                                <div class="info-row"><i class="fas fa-user-tie"></i> <div><strong>Chủ đất:</strong> <%= bai.tenChuDat %> - <%= bai.soDienThoai %></div></div>
+                                <div class="info-row"><i class="fas fa-map-marker-alt"></i> <div><%= bai.diaChiChiTiet %></div></div>
+                                <div class="info-row"><i class="fas fa-expand-arrows-alt"></i> <div><strong>Diện tích:</strong> <%= bai.dienTich %> m² &nbsp;|&nbsp; <strong>Sức chứa tối đa:</strong> <%= bai.sucChuaToiDa %> đàn</div></div>
+                                
+                                <!-- Tình trạng chỗ trống và cho thuê tiếp -->
+                                <div class="info-row">
+                                    <i class="fas fa-boxes-stacked"></i> 
+                                    <div>
+                                        <strong>Chỗ trống:</strong> 
+                                        <% if (bai.sucChuaConLai <= 0) { %>
+                                            <span class="badge bg-danger">Đã hết chỗ (<%= bai.soDanDaThue %>/<%= bai.sucChuaToiDa %> đàn)</span>
+                                        <% } else if (bai.soDanDaThue > 0) { %>
+                                            <span class="badge bg-success">Còn trống <%= bai.sucChuaConLai %> đàn (Có thể thuê tiếp)</span>
+                                            <div class="small text-muted mt-1">Đã có người thuê <%= bai.soDanDaThue %> đàn</div>
+                                        <% } else { %>
+                                            <span class="badge bg-warning text-dark">Còn trống <%= bai.sucChuaToiDa %> đàn (Chưa ai thuê)</span>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <!-- Nếu Đang có người thuê, hiển thị thông tin đối tác & sản lượng -->
+                                <% if (bai.soDanDaThue > 0) { %>
+                                    <div class="rental-info">
+                                        <div class="text-success fw-bold mb-2"><i class="fas fa-handshake me-1"></i> Thông Tin Đối Tác Đang Đặt Ong</div>
+                                        <div class="small mb-1"><strong>Người nuôi:</strong> <%= bai.danhSachNguoiThue || 'Đang cập nhật' %></div>
+                                        <div class="small mb-1"><strong>Sản lượng dự kiến:</strong> <%= bai.sanLuongHienCo || 'Đang khai thác mật' %></div>
+                                        <% if (bai.sucChuaConLai > 0) { %>
+                                            <div class="small text-primary fw-bold mt-1"><i class="fas fa-check-circle me-1"></i> Vẫn còn <%= bai.sucChuaConLai %> chỗ: Cho phép người nuôi khác thuê tiếp!</div>
+                                        <% } else { %>
+                                            <div class="small text-danger fw-bold mt-1"><i class="fas fa-ban me-1"></i> Đã kín chỗ toàn bộ sức chứa!</div>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Nút bấm QR Code -->
+                            <div class="card-footer bg-white border-top-0 pb-3 text-center">
+                                <a href="#" class="btn btn-outline-dark btn-sm fw-bold mb-2 w-100" data-bs-toggle="modal" data-bs-target="#qrModal<%= bai.maDiaDiem %>">
+                                    <i class="fas fa-qrcode"></i> Mã QR Truy Xuất
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Modal hiển thị QR Code cho từng bài đăng -->
+                    <div class="modal fade" id="qrModal<%= bai.maDiaDiem %>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-sm modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-dark text-white border-0">
+                                    <h6 class="modal-title fw-bold"><i class="fas fa-qrcode me-2"></i>QR Nguồn Gốc</h6>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-center py-4">
+                                    <p class="fw-bold text-primary mb-3"><%= bai.tenDiaDiem %></p>
+                                    
+                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://<%= host %>/truy-xuat/<%= bai.maDiaDiem %>" alt="QR Code" ...>
+                                    
+                                    <p class="small text-muted mt-3">Quét mã bằng điện thoại để xem chi tiết nguồn gốc mật ong tại vườn này.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-5">
+                    <h5 class="text-muted">Chưa có bài đăng nào được duyệt.</h5>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Script Bootstrap cần thiết để mở Modal QR Code -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

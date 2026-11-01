@@ -1,0 +1,26 @@
+# Node modules
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Environment & Secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs
+**/*.log
+error.log
+output.log
+
+# Flutter / Dart
+**/mobile_ongmat/.dart_tool/
+**/mobile_ongmat/.packages
+**/mobile_ongmat/build/
+**/mobile_ongmat/.flutter-plugins
+**/mobile_ongmat/.flutter-plugins-dependencies
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.idea/

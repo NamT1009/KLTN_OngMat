@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập | Hệ Thống Quản Trị & Truy Vết Ong Mật</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & Font Awesome 6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-amber: #f59e0b;
+            --primary-amber-hover: #d97706;
+            --primary-amber-glow: rgba(245, 158, 11, 0.4);
+            --bg-dark: #080d1a;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --border-color: rgba(245, 158, 11, 0.28);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --input-bg: rgba(10, 15, 29, 0.75);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            /* Hình nền đàn ong mật tại thung lũng hoa với ánh hoàng hôn rực rỡ */
+            background-image: 
+                linear-gradient(135deg, rgba(8, 13, 26, 0.78) 0%, rgba(15, 23, 42, 0.82) 50%, rgba(8, 13, 26, 0.88) 100%),
+                url('/images/bee_background.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 24px;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating background ambient glow */
+        .ambient-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(50px);
+            z-index: 0;
+            animation: pulse-glow 9s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1) translate(-20px, -20px); opacity: 0.6; }
+            100% { transform: scale(1.18) translate(30px, 30px); opacity: 0.95; }
+        }
+
+        .login-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 440px;
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 
+                0 25px 60px -15px rgba(0, 0, 0, 0.75),
+                0 0 45px -8px var(--primary-amber-glow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .login-card:hover {
+            border-color: rgba(245, 158, 11, 0.45);
+            box-shadow: 
+                0 30px 70px -15px rgba(0, 0, 0, 0.85),
+                0 0 55px -8px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Brand Header */
+        .brand-header {
+            padding: 34px 28px 20px 28px;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Logo Con Ong Lục Giác Cao Cấp */
+        .brand-logo-hex {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px auto;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.22), rgba(217, 119, 6, 0.45));
+            border: 1px solid rgba(245, 158, 11, 0.55);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+            transition: transform 0.3s ease;
+            padding: 8px;
+        }
+
+        .login-card:hover .brand-logo-hex {
+            transform: scale(1.06);
+        }
+
+        .brand-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fef08a 0%, #fbbf24 45%, #f59e0b 80%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+
+        .role-badges {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .role-pill {
+            font-size: 0.72rem;
+            padding: 4px 11px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-weight: 500;
+        }
+
+        .role-pill.admin {
+            background: rgba(245, 158, 11, 0.16);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.35);
+            font-weight: 700;
+        }
+
+        /* Card Body */
+        .card-body-content {
+            padding: 0 32px 34px 32px;
+        }
+
+        .form-label {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group-custom {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            color: #64748b;
+            font-size: 1rem;
+            z-index: 5;
+            transition: color 0.2s ease;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            background: var(--input-bg);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 12px 14px 12px 42px;
+            font-size: 0.92rem;
+            color: #f8fafc;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+
+        .form-control-custom.has-toggle {
+            padding-right: 44px;
+        }
+
+        .form-control-custom::placeholder {
+            color: #475569;
+            font-weight: 400;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            background: rgba(15, 23, 42, 0.95);
+            border-color: var(--primary-amber);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+            color: #fff;
+        }
+
+        .input-group-custom:focus-within .input-icon {
+            color: var(--primary-amber);
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            z-index: 5;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-btn:hover {
+            color: #cbd5e1;
+        }
+
+        /* Error Banner */
+        .custom-alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Buttons */
+        .btn-honey-primary {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 0.96rem;
+            border: none;
+            border-radius: 12px;
+            padding: 13px 20px;
+            width: 100%;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.42);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-honey-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px -4px rgba(245, 158, 11, 0.6);
+            background: linear-gradient(135deg, #fde047 0%, #fbbf24 50%, #f59e0b 100%);
+            color: #0b0f19;
+        }
+
+        .btn-honey-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Secondary Tra Cuu Button */
+        .btn-trace-link {
+            background: rgba(34, 197, 94, 0.12);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            width: 100%;
+        }
+
+        .btn-trace-link:hover {
+            background: rgba(34, 197, 94, 0.22);
+            border-color: rgba(34, 197, 94, 0.55);
+            color: #86efac;
+            transform: translateY(-1px);
+        }
+
+        .divider-custom {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 22px 0;
+            color: #64748b;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .divider-custom::before,
+        .divider-custom::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider-custom span {
+            padding: 0 12px;
+        }
+
+        .auth-footer-link {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer-link a {
+            color: #fbbf24;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .auth-footer-link a:hover {
+            color: #fde047;
+            text-decoration: underline;
+        }
+
+        .badge-system {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.74rem;
+            color: #94a3b8;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+            animation: pulse-live 2s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <!-- Brand Header -->
+            <div class="brand-header">
+                <!-- Vector Logo Con Ong Mật Vàng Chuẩn Đồ Án -->
+                <div class="brand-logo-hex">
+                    <svg viewBox="0 0 64 64" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Tổ ong viền ngoài -->
+                        <polygon points="32,4 58,18 58,46 32,60 6,46 6,18" fill="url(#loginHexGrad)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round"/>
+                        <!-- Cánh ong bên trái -->
+                        <ellipse cx="20" cy="23" rx="8" ry="14" transform="rotate(-38 20 23)" fill="url(#loginWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                        <path d="M16 15 Q20 23 24 28" stroke="#fef08a" stroke-width="0.8" opacity="0.6"/>
+                        <!-- Cánh ong bên phải -->
+                        <ellipse cx="44" cy="23" rx="8" ry="14" transform="rotate(38 44 23)" fill="url(#loginWingGrad)" stroke="#fef08a" stroke-width="1.2" opacity="0.95"/>
+                        <path d="M48 15 Q44 23 40 28" stroke="#fef08a" stroke-width="0.8" opacity="0.6"/>
+                        <!-- Thân ong mật -->
+                        <ellipse cx="32" cy="36" rx="11" ry="16" fill="url(#loginBodyGrad)"/>
+                        <!-- Sọc đen bụng ong -->
+                        <path d="M22.5 30 Q32 32.5 41.5 30 L41 33.5 Q32 36 23 33.5 Z" fill="#0f172a"/>
+                        <path d="M21.5 37 Q32 40 42.5 37 L41.5 40.5 Q32 43.5 22.5 40.5 Z" fill="#0f172a"/>
+                        <path d="M24 44.5 Q32 47 40 44.5 L38.5 48 Q32 50.5 25.5 48 Z" fill="#0f172a"/>
+                        <!-- Đuôi kim chích -->
+                        <path d="M30.5 51.5 L32 56 L33.5 51.5 Z" fill="#0f172a"/>
+                        <!-- Đầu ong -->
+                        <circle cx="32" cy="22" r="7.5" fill="#f59e0b"/>
+                        <ellipse cx="29" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                        <circle cx="28.5" cy="20.2" r="0.6" fill="#ffffff"/>
+                        <ellipse cx="35" cy="21" rx="1.8" ry="2.2" fill="#0f172a"/>
+                        <circle cx="34.5" cy="20.2" r="0.6" fill="#ffffff"/>
+                        <!-- Râu ong -->
+                        <path d="M29 16 Q26 9 20 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="20" cy="11" r="1.8" fill="#fbbf24"/>
+                        <path d="M35 16 Q38 9 44 11" stroke="#d97706" stroke-width="2" stroke-linecap="round" fill="none"/>
+                        <circle cx="44" cy="11" r="1.8" fill="#fbbf24"/>
+                        <defs>
+                            <linearGradient id="loginHexGrad" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#b45309" stop-opacity="0.4"/>
+                                <stop offset="1" stop-color="#f59e0b" stop-opacity="0.12"/>
+                            </linearGradient>
+                            <linearGradient id="loginBodyGrad" x1="21" y1="20" x2="43" y2="52" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#fde047"/>
+                                <stop offset="0.5" stop-color="#f59e0b"/>
+                                <stop offset="1" stop-color="#d97706"/>
+                            </linearGradient>
+                            <linearGradient id="loginWingGrad" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#ffffff" stop-opacity="0.95"/>
+                                <stop offset="0.8" stop-color="#fef9c3" stop-opacity="0.75"/>
+                                <stop offset="1" stop-color="#fde047" stop-opacity="0.5"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1 class="brand-title">TRUY VẾT ONG MẬT</h1>
+                <p class="brand-subtitle">Hệ Thống Quản Trị & Chuỗi Cung Ứng Thông Minh</p>
+                <div class="role-badges">
+                    <span class="role-pill admin"><i class="fas fa-shield-alt me-1"></i> Quản trị viên</span>
+                    <span class="role-pill"><i class="fas fa-archive me-1"></i> Người nuôi ong</span>
+                    <span class="role-pill"><i class="fas fa-seedling me-1"></i> Chủ đất</span>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="card-body-content">
+                <!-- Thông báo lỗi nếu có -->
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="custom-alert-error" role="alert">
+                        <i class="fas fa-exclamation-circle fs-5"></i>
+                        <span><%= error %></span>
+                    </div>
+                <% } %>
+
+                <form action="/login" method="POST" id="loginForm">
+                    <!-- Tài khoản -->
+                    <div class="mb-3">
+                        <label class="form-label" for="loginEmail">
+                            <span>Email hoặc số điện thoại</span>
+                        </label>
+                        <div class="input-group-custom">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input 
+                                type="text" 
+                                id="loginEmail"
+                                name="email" 
+                                class="form-control-custom" 
+                                required 
+                                placeholder="admin@ongmat.vn hoặc số điện thoại"
+                                autocomplete="username"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Mật khẩu -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label mb-0" for="loginPassword">
+                                <span>Mật khẩu</span>
+                            </label>
+                        </div>
+                        <div class="input-group-custom">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input 
+                                type="password" 
+                                id="loginPassword"
+                                name="matKhau" 
+                                class="form-control-custom has-toggle" 
+                                required 
+                                placeholder="Nhập mật khẩu của bạn"
+                                autocomplete="current-password"
+                            >
+                            <button type="button" class="password-toggle-btn" id="togglePasswordBtn" title="Hiện/ẩn mật khẩu">
+                                <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Nút Submit -->
+                    <button type="submit" class="btn-honey-primary" id="submitBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Đăng Nhập Hệ Thống</span>
+                    </button>
+                </form>
+
+                <!-- Đăng ký tài khoản đối tác -->
+                <div class="auth-footer-link">
+                    Chưa có tài khoản đối tác? 
+                    <a href="/dang-ky">Đăng ký ngay</a>
+                </div>
+
+                <div class="divider-custom">
+                    <span>HOẶC</span>
+                </div>
+
+                <!-- Dành cho người tiêu dùng tra cứu -->
+                <a href="/tra-cuu" class="btn-trace-link">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Khách hàng: Tra cứu nguồn gốc mật ong</span>
+                    <i class="fas fa-arrow-right ms-auto"></i>
+                </a>
+
+                <div class="text-center">
+                    <div class="badge-system">
+                        <span class="pulse-dot"></span>
+                        <span>Hệ thống giám sát v2.5 Smart Apiary</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle ẩn/hiện mật khẩu
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passInput = document.getElementById('loginPassword');
+        const passIcon = document.getElementById('togglePasswordIcon');
+
+        if (toggleBtn && passInput && passIcon) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = passInput.getAttribute('type') === 'password';
+                passInput.setAttribute('type', isPassword ? 'text' : 'password');
+                passIcon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+        }
+
+        // Thêm trạng thái loading nhẹ khi bấm Submit
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        if (form && submitBtn) {
+            form.addEventListener('submit', () => {
+                submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i> Đang xác thực...';
+                submitBtn.style.opacity = '0.85';
+                submitBtn.style.pointerEvents = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

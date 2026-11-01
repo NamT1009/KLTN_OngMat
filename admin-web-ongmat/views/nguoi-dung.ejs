@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản Lý Người Dùng | Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background-color: #343a40;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #212529;
+            text-align: center;
+            color: #ffc107;
+            border-bottom: 1px solid #4b545c;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 20px;
+            color: #c2c7d0;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: #495057;
+            color: #fff;
+            border-left-color: #ffc107;
+        }
+
+        .sidebar-menu li a i {
+            width: 25px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('partials/sidebar') %>
+        <!-- Nhúng thanh Header Toàn cục -->
+        <%- include('partials/topbar') %>
+
+            <div class="main-content">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="text-secondary">Quản Lý Người Dùng & Tài Khoản</h3>
+                    <button class="btn btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalThemNguoiDung">
+                        <i class="fas fa-user-plus"></i> Thêm Người Dùng
+                    </button>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th class="ps-4">ID</th>
+                                    <th class="text-center">Ảnh</th>
+                                    <th>Họ Tên</th>
+                                    <th>Liên Hệ</th>
+                                    <th>Vai Trò</th>
+                                    <th>Trạng Thái</th>
+                                    <th class="text-center">Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% danhSachNguoiDung.forEach(function(user) { %>
+                                    <tr>
+                                        <td class="ps-4 fw-bold">
+                                            <%= user.maNguoiDung %>
+                                        </td>
+
+                                        <!-- Cột Ảnh đại diện -->
+                                        <td class="text-center">
+                                            <% if (user.anhDaiDien) { %>
+                                                <img src="<%= user.anhDaiDien %>" alt="Avatar"
+                                                    class="rounded-circle border shadow-sm"
+                                                    style="width: 42px; height: 42px; object-fit: cover;"
+                                                    onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.hoTen || 'User') %>&background=ffb800&color=fff&bold=true'">
+                                                <% } else { %>
+                                                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold shadow-sm"
+                                                        style="width: 42px; height: 42px; font-size: 1rem; background-color: #ffb800;">
+                                                        <%= user.hoTen ? user.hoTen.trim().charAt(0).toUpperCase() : 'U'
+                                                            %>
+                                                    </div>
+                                                    <% } %>
+                                        </td>
+
+                                        <td class="fw-bold text-primary">
+                                            <%= user.hoTen %>
+                                        </td>
+                                        <td>
+                                            <div><i class="fas fa-envelope text-muted"></i>
+                                                <%= user.email %>
+                                            </div>
+                                            <div><i class="fas fa-phone text-muted"></i>
+                                                <%= user.soDienThoai %>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <% if(user.vaiTro==='admin' ) { %>
+                                                <span class="badge bg-danger">Quản trị viên</span>
+                                                <% } else if(user.vaiTro==='chuDat' ) { %>
+                                                    <span class="badge bg-success">Chủ đất</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-warning text-dark">Người nuôi ong</span>
+                                                        <% } %>
+                                        </td>
+                                        <td>
+                                            <% if(user.trangThaiTaiKhoan==='HoatDong' ) { %>
+                                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Đang
+                                                    hoạt động</span>
+                                                <% } else if(user.trangThaiTaiKhoan==='DaKhoa' ) { %>
+                                                    <span class="badge bg-danger"><i class="fas fa-lock"></i> Đã bị
+                                                        khóa</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-secondary">Chờ xác thực</span>
+                                                        <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if(user.vaiTro !=='admin' ) { %>
+                                                <div class="d-flex justify-content-center gap-1">
+                                                    <!-- Nút Sửa -->
+                                                    <button class="btn btn-sm btn-outline-primary" title="Sửa"
+                                                        onclick="chuanBiSua('<%= user.maNguoiDung %>', '<%= user.hoTen %>', '<%= user.soDienThoai %>', '<%= user.vaiTro %>')">
+                                                        <i class="fas fa-edit"></i> Sửa
+                                                    </button>
+
+                                                    <!-- Nút Khóa / Mở Khóa -->
+                                                    <% if(user.trangThaiTaiKhoan==='HoatDong' ||
+                                                        user.trangThaiTaiKhoan==='ChoXacThuc' ) { %>
+                                                        <button
+                                                            onclick="doiTrangThai('<%= user.maNguoiDung %>', 'DaKhoa')"
+                                                            class="btn btn-sm btn-outline-danger"
+                                                            title="Khóa tài khoản">
+                                                            <i class="fas fa-ban"></i> Khóa
+                                                        </button>
+                                                        <% } else if(user.trangThaiTaiKhoan==='DaKhoa' ) { %>
+                                                            <button
+                                                                onclick="doiTrangThai('<%= user.maNguoiDung %>', 'HoatDong')"
+                                                                class="btn btn-sm btn-outline-success"
+                                                                title="Mở khóa tài khoản">
+                                                                <i class="fas fa-unlock"></i> Mở
+                                                            </button>
+                                                            <% } %>
+
+                                                                <!-- Nút Xóa -->
+                                                                <button class="btn btn-sm btn-outline-dark" title="Xóa"
+                                                                    onclick="xoaNguoiDung('<%= user.maNguoiDung %>')">
+                                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                                </button>
+                                                </div>
+                                                <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL THÊM NGƯỜI DÙNG -->
+            <div class="modal fade" id="modalThemNguoiDung" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title fw-bold">Thêm Người Dùng Mới</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Họ và Tên:</label>
+                                <input type="text" id="addHoTen" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Email:</label>
+                                <input type="email" id="addEmail" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số điện thoại:</label>
+                                <input type="text" id="addSdt" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mật khẩu:</label>
+                                <input type="password" id="addMatKhau" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Vai trò:</label>
+                                <select id="addVaiTro" class="form-select">
+                                    <option value="chuDat">Chủ đất</option>
+                                    <option value="nguoiNuoiOng">Người nuôi ong</option>
+                                    <option value="admin">Quản trị viên (Admin)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" onclick="thucHienThemNguoiDung()" class="btn btn-success">Lưu Người
+                                Dùng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL SỬA NGƯỜI DÙNG -->
+            <div class="modal fade" id="modalSuaNguoiDung" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title fw-bold">Chỉnh Sửa Thông Tin</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="editMaNguoiDung">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Họ và Tên:</label>
+                                <input type="text" id="editHoTen" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Số điện thoại:</label>
+                                <input type="text" id="editSdt" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Vai trò:</label>
+                                <select id="editVaiTro" class="form-select">
+                                    <option value="chuDat">Chủ Đất</option>
+                                    <option value="nguoiNuoiOng">Người Nuôi Ong</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="button" onclick="thucHienSuaNguoiDung()" class="btn btn-primary fw-bold">Cập
+                                Nhật</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Hàm Thêm Người Dùng
+                async function thucHienThemNguoiDung() {
+                    const hoTen = document.getElementById('addHoTen').value;
+                    const email = document.getElementById('addEmail').value;
+                    const soDienThoai = document.getElementById('addSdt').value;
+                    const matKhau = document.getElementById('addMatKhau').value;
+                    const vaiTro = document.getElementById('addVaiTro').value;
+
+                    if (!hoTen || !email || !soDienThoai || !matKhau) {
+                        alert("Vui lòng điền đầy đủ thông tin!");
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/nguoi-dung/them', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ hoTen, email, soDienThoai, matKhau, vaiTro })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối Server!");
+                    }
+                }
+
+                // Hàm Đổi Trạng Thái Khóa/Mở Khóa
+                async function doiTrangThai(id, trangThaiMoi) {
+                    const actionText = trangThaiMoi === 'DaKhoa' ? 'KHÓA' : 'MỞ KHÓA';
+                    if (!confirm(`Bạn có chắc chắn muốn ${actionText} tài khoản ID ${id} không?`)) return;
+
+                    try {
+                        const response = await fetch('/api/nguoi-dung/trang-thai', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: id, trangThaiMoi: trangThaiMoi })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối Server!");
+                    }
+                }
+
+                // Hàm Đổ dữ liệu lên Modal Sửa
+                function chuanBiSua(id, hoTen, sdt, vaiTro) {
+                    document.getElementById('editMaNguoiDung').value = id;
+                    document.getElementById('editHoTen').value = hoTen;
+                    document.getElementById('editSdt').value = sdt;
+                    document.getElementById('editVaiTro').value = vaiTro;
+                    new bootstrap.Modal(document.getElementById('modalSuaNguoiDung')).show();
+                }
+
+                // Hàm Lưu Dữ liệu Sửa
+                async function thucHienSuaNguoiDung() {
+                    const maNguoiDung = document.getElementById('editMaNguoiDung').value;
+                    const hoTen = document.getElementById('editHoTen').value;
+                    const soDienThoai = document.getElementById('editSdt').value;
+                    const vaiTro = document.getElementById('editVaiTro').value;
+
+                    try {
+                        const response = await fetch('/api/nguoi-dung/sua', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ maNguoiDung, hoTen, soDienThoai, vaiTro })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối Server!");
+                    }
+                }
+
+                // Hàm Xóa Người Dùng
+                async function xoaNguoiDung(id) {
+                    if (!confirm('CẢNH BÁO: Bạn có chắc chắn muốn xóa vĩnh viễn người dùng này? Thao tác này không thể hoàn tác!')) return;
+
+                    try {
+                        const response = await fetch('/api/nguoi-dung/xoa', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id })
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert(data.message);
+                        }
+                    } catch (error) {
+                        alert("Lỗi kết nối Server!");
+                    }
+                }
+            </script>
+</body>
+
+</html>
